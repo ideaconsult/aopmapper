@@ -10,54 +10,71 @@ export const FL =
   'biological_organization_level_t,attr_assays,casrn_s,' +
   'preferred_name_t,dsstox_id_s,jchem_inchi_key_s';
 
-/**
- * Build a URLSearchParams for the Solr query based on search state.
- * Returns params (without start/rows – caller adds those).
- */
-export async function buildSolrParams(state) {
-  const {
-    q = '',
-    fieldId = '',
-    graph = '0',
-    types = [],
-    filters = {},
-  } = state;
+const TIMEOUT_MS = 30_000;
 
-  // --- Build base query ---
+/** Fetch with combined caller signal + timeout */
+async function solrFetch(url, options = {}) {
+  const { signal: callerSignal, ...rest } = options;
+
+  const timeoutController = new AbortController();
+  const timeoutId = setTimeout(() => timeoutController.abort(), TIMEOUT_MS);
+
+  // AbortSignal.any() is available in all modern browsers
+  const signal = callerSignal
+    ? AbortSignal.any([callerSignal, timeoutController.signal])
+    : timeoutController.signal;
+
+  try {
+    const res = await fetch(url, { ...rest, signal });
+    clearTimeout(timeoutId);
+
+    if (!res.ok) {
+      let msg = `HTTP ${res.status}`;
+      try {
+        const body = await res.json();
+        msg = body?.error?.msg || JSON.stringify(body?.error) || msg;
+      } catch { /* ignore parse error */ }
+      throw new Error(msg);
+    }
+
+    const data = await res.json();
+
+    // Solr returns 200 with an error key on bad queries
+    if (data?.error) {
+      throw new Error(data.error.msg || JSON.stringify(data.error));
+    }
+
+    return data;
+  } catch (e) {
+    clearTimeout(timeoutId);
+    throw e;
+  }
+}
+
+/** Build URLSearchParams from search state. Async because similarity needs a vector fetch. */
+export async function buildSolrParams(state) {
+  const { q = '', fieldId = '', graph = '0', types = [], filters = {} } = state;
+
   let qValue = q.trim() || '*:*';
 
-  // Additional field filters (second/third form rows)
-  const additionalFieldMap = {
-    id: 'field_id',
-    biological_object_ids_ss: 'biological_object_ids_ss',
-    biological_process_ids_ss: 'biological_process_ids_ss',
-    biological_action_ids_ss: 'biological_action_ids_ss',
-    biological_organization_level_t: 'biological_organization_level_t',
-    attr_organ_term: 'attr_organ_term',
-    attr_cell_term: 'attr_cell_term',
-    molecular_initiating_event_ss: 'molecular_initiating_event_ss',
-    adverse_outcome_ss: 'adverse_outcome_ss',
-    attr_assays: 'attr_assays',
-    casrn_s: 'casrn_s',
-    attr_applicability_taxonomy: 'attr_applicability_taxonomy',
-    doi_ss: 'doi_ss',
-  };
-
+  // Additional field clauses
   const clauses = [];
+  if (fieldId.trim()) clauses.push(`id:${fieldId.trim()}`);
 
-  // field_id handling
-  if (fieldId.trim()) {
-    clauses.push(`id:${fieldId.trim()}`);
-  }
+  const filterFields = [
+    'biological_object_ids_ss', 'biological_process_ids_ss',
+    'biological_action_ids_ss', 'biological_organization_level_t',
+    'attr_organ_term', 'attr_cell_term',
+    'molecular_initiating_event_ss', 'adverse_outcome_ss',
+    'attr_assays', 'casrn_s', 'attr_applicability_taxonomy', 'doi_ss',
+  ];
 
-  for (const [solrField] of Object.entries(additionalFieldMap)) {
-    if (solrField === 'id') continue; // handled above
-    const val = filters[solrField]?.trim();
+  for (const field of filterFields) {
+    const val = filters[field]?.trim();
     if (val) {
-      // strip trailing " | CODE" pattern (autocomplete returns "label | CODE")
       const parts = val.split('|');
       const code = parts[parts.length - 1].trim();
-      clauses.push(`${solrField}:${code}`);
+      clauses.push(`${field}:${code}`);
     }
   }
 
@@ -66,28 +83,16 @@ export async function buildSolrParams(state) {
     qValue = qValue === '*:*' ? extra : `(${qValue}) AND ${extra}`;
   }
 
-  // --- Graph expansion ---
+  // Graph expansion
   if (graph === 'similarity') {
     const vector = await fetchVectorById(qValue);
     if (vector) {
-      const vectorStr = vector.map(v => v.toFixed(3)).join(',');
-      qValue = `{!knn f=spectrum_p2048 topK=10}[${vectorStr}]`;
+      qValue = `{!knn f=spectrum_p2048 topK=10}[${vector.map(v => v.toFixed(3)).join(',')}]`;
     }
   } else if (graph === 'AOP') {
-    qValue =
-      `({!join from=key_event_ss to=id}${qValue}` +
-      ` OR {!join from=adverse_outcome_ss to=id}${qValue}` +
-      ` OR {!join from=molecular_initiating_event_ss to=id}${qValue}` +
-      ` OR {!join from=aop_stressor_ss to=id}${qValue}` +
-      ` OR ${qValue})`;
+    qValue = `({!join from=key_event_ss to=id}${qValue} OR {!join from=adverse_outcome_ss to=id}${qValue} OR {!join from=molecular_initiating_event_ss to=id}${qValue} OR {!join from=aop_stressor_ss to=id}${qValue} OR ${qValue})`;
   } else if (graph === 'AOPextended') {
-    qValue =
-      `{!graph from=id to=upstream_ss maxDepth=1 returnRoot=true}` +
-      `({!join from=key_event_ss to=id}${qValue}` +
-      ` OR {!join from=adverse_outcome_ss to=id}${qValue}` +
-      ` OR {!join from=molecular_initiating_event_ss to=id}${qValue}` +
-      ` OR {!join from=aop_stressor_ss to=id}${qValue}` +
-      ` OR ${qValue})`;
+    qValue = `{!graph from=id to=upstream_ss maxDepth=1 returnRoot=true}({!join from=key_event_ss to=id}${qValue} OR {!join from=adverse_outcome_ss to=id}${qValue} OR {!join from=molecular_initiating_event_ss to=id}${qValue} OR {!join from=aop_stressor_ss to=id}${qValue} OR ${qValue})`;
   } else if (graph === 'MIE') {
     qValue = `({!join from=molecular_initiating_event_ss to=id}${qValue} OR ${qValue})`;
   } else if (graph === 'AO') {
@@ -99,12 +104,10 @@ export async function buildSolrParams(state) {
   } else {
     const depth = parseInt(graph, 10);
     if (!isNaN(depth) && depth !== 0) {
-      const direction = depth > 0 ? 'upstream_ss' : 'downstream_ss';
-      if (Math.abs(depth) > 100) {
-        qValue = `{!graph from=id to=${direction} returnRoot=true}(${qValue})`;
-      } else {
-        qValue = `{!graph from=id to=${direction} returnRoot=true maxDepth=${Math.abs(depth)}}(${qValue})`;
-      }
+      const dir = depth > 0 ? 'upstream_ss' : 'downstream_ss';
+      qValue = Math.abs(depth) > 100
+        ? `{!graph from=id to=${dir} returnRoot=true}(${qValue})`
+        : `{!graph from=id to=${dir} returnRoot=true maxDepth=${Math.abs(depth)}}(${qValue})`;
     } else {
       qValue = `(${qValue})`;
     }
@@ -112,59 +115,62 @@ export async function buildSolrParams(state) {
 
   const params = new URLSearchParams();
   params.append('q', qValue);
-
-  if (types.length > 0) {
-    params.append('fq', `type_s:(${types.join(' OR ')})`);
-  }
-
+  if (types.length > 0) params.append('fq', `type_s:(${types.join(' OR ')})`);
   params.append('wt', 'json');
   params.append('fl', FL);
+  // Request type_s facets on every query
+  params.append('facet', 'true');
+  params.append('facet.field', 'type_s');
+  params.append('facet.mincount', '1');
 
   return params;
 }
 
-/** Fetch a single page from Solr */
-export async function fetchSolrPage(params, start, rows, sortField, sortDir) {
+/** Fetch one result page. Signal is optional (AbortController). */
+export async function fetchSolrPage(params, start, rows, sortField, sortDir, signal) {
   const p = new URLSearchParams(params);
   p.set('start', start);
   p.set('rows', rows);
   if (sortField) p.set('sort', `${sortField} ${sortDir}`);
-
-  const res = await fetch(SOLR_URL, {
+  return solrFetch(SOLR_URL, {
     method: 'POST',
     headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
     body: p.toString(),
+    signal,
   });
-  if (!res.ok) throw new Error(`Solr HTTP ${res.status}`);
-  return res.json();
 }
 
-/** Fetch all results for graph/download (up to 10000) */
-export async function fetchAllResults(params) {
+/** Max nodes to render in the graph. Above this show a warning + truncate. */
+export const GRAPH_NODE_CAP = 500;
+
+/** Fetch all docs for graph/download. */
+export async function fetchAllResults(params, signal) {
   const p = new URLSearchParams(params);
   p.set('start', 0);
   p.set('rows', 10000);
-  const res = await fetch(`${SOLR_URL}?${p.toString()}`);
-  if (!res.ok) throw new Error(`Solr HTTP ${res.status}`);
-  const data = await res.json();
+  p.delete('facet');
+  p.delete('facet.field');
+  p.delete('facet.mincount');
+  const data = await solrFetch(`${SOLR_URL}?${p.toString()}`, { signal });
   return data?.response?.docs || [];
 }
 
-/** Fetch vector for similarity search */
+/** Fetch embedding vector for similarity search */
 export async function fetchVectorById(docId, vectorEmbedding = 'spectrum_p2048') {
-  const url = new URL(SOLR_URL);
-  url.searchParams.set('q', docId);
-  url.searchParams.set('fl', vectorEmbedding);
-  url.searchParams.set('wt', 'json');
-  url.searchParams.set('rows', 1);
-  const res = await fetch(url.toString());
-  if (!res.ok) return null;
-  const data = await res.json();
-  const doc = data?.response?.docs?.[0];
-  return doc?.[vectorEmbedding] || null;
+  try {
+    const url = new URL(SOLR_URL);
+    url.searchParams.set('q', docId);
+    url.searchParams.set('fl', vectorEmbedding);
+    url.searchParams.set('wt', 'json');
+    url.searchParams.set('rows', 1);
+    const data = await solrFetch(url.toString());
+    return data?.response?.docs?.[0]?.[vectorEmbedding] || null;
+  } catch {
+    return null;
+  }
 }
 
-/** Fetch facet suggestions (for facet-based autocomplete) */
+/** Facet-based autocomplete suggestions */
 export async function fetchFacetSuggestions(facetField, prefix) {
   const url = new URL(SOLR_URL);
   url.searchParams.set('q', '*:*');
@@ -174,52 +180,50 @@ export async function fetchFacetSuggestions(facetField, prefix) {
   url.searchParams.set('facet.field', facetField);
   url.searchParams.set('facet.prefix', prefix);
   url.searchParams.set('facet.limit', 10);
-  const res = await fetch(url.toString());
-  if (!res.ok) return [];
-  const data = await res.json();
-  const arr = data?.facet_counts?.facet_fields?.[facetField] || [];
-  const results = [];
-  for (let i = 0; i < arr.length; i += 2) {
-    if (arr[i]) results.push(arr[i]);
-  }
-  return results;
+  try {
+    const data = await solrFetch(url.toString());
+    const arr = data?.facet_counts?.facet_fields?.[facetField] || [];
+    const out = [];
+    for (let i = 0; i < arr.length; i += 2) if (arr[i]) out.push(arr[i]);
+    return out;
+  } catch { return []; }
 }
 
-/** Fetch doc-based autocomplete suggestions */
+/** Doc-based autocomplete suggestions */
 export async function fetchDocSuggestions(labelField, codeField, fq, query) {
   const url = new URL(SOLR_URL);
   url.searchParams.set('q', `${query}*`);
   url.searchParams.set('fq', fq);
-  const fl = codeField ? `${labelField},${codeField}` : labelField;
-  url.searchParams.set('fl', fl);
+  url.searchParams.set('fl', codeField ? `${labelField},${codeField}` : labelField);
   url.searchParams.set('rows', 10);
   url.searchParams.set('wt', 'json');
-  const res = await fetch(url.toString());
-  if (!res.ok) return [];
-  const data = await res.json();
-  const seen = new Set();
-  const results = [];
-  for (const doc of data?.response?.docs || []) {
-    let val = doc[labelField];
-    if (codeField && doc[codeField]) val = `${val} | ${doc[codeField]}`;
-    const vals = Array.isArray(val) ? val : [val];
-    for (const v of vals) {
-      if (v && !seen.has(v)) { seen.add(v); results.push(v); }
+  try {
+    const data = await solrFetch(url.toString());
+    const seen = new Set();
+    const out = [];
+    for (const doc of data?.response?.docs || []) {
+      let val = doc[labelField];
+      if (codeField && doc[codeField]) val = `${val} | ${doc[codeField]}`;
+      for (const v of (Array.isArray(val) ? val : [val])) {
+        if (v && !seen.has(v)) { seen.add(v); out.push(v); }
+      }
     }
-  }
-  return results;
+    return out;
+  } catch { return []; }
 }
 
-/** Generate Python snippet for debug tab */
-export function generatePythonCode(params) {
-  const obj = Object.fromEntries(new URLSearchParams(params));
+/** Generate Python snippet */
+export function generatePythonCode(paramsString) {
+  const obj = Object.fromEntries(new URLSearchParams(paramsString));
+  // Strip internal facet params
+  ['facet', 'facet.field', 'facet.mincount'].forEach(k => delete obj[k]);
   const lines = Object.entries(obj).map(
-    ([k, v]) => `    '${k}': '${v.replace(/'/g, "\\'")}',`
+    ([k, v]) => `    '${k}': '${v.replace(/\\/g, '\\\\').replace(/'/g, "\\'")}',`
   );
   return `import requests
 import json
 
-solr_url = "https://api.ideaconsult.net/enanomapper/aop"
+solr_url = "${SOLR_URL}"
 params = {
 ${lines.join('\n')}
 }
@@ -228,7 +232,7 @@ data = response.json()
 print(json.dumps(data, indent=2))`;
 }
 
-/** Build CSV blob URL from docs array */
+/** Build a CSV blob URL from a docs array */
 export function buildCsvUrl(docs) {
   if (!docs?.length) return null;
   const keys = [...new Set(docs.flatMap(d => Object.keys(d)))];

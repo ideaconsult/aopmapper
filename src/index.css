@@ -9,7 +9,7 @@ body {
   background: #f8f9fa;
 }
 
-/* Header */
+/* ── Header ────────────────────────────────────────── */
 .aop-header {
   background: #fff;
   border-bottom: 1px solid #e5e7eb;
@@ -18,40 +18,26 @@ body {
   align-items: center;
   gap: 1rem;
 }
-.aop-logo {
-  height: 40px;
-  width: auto;
-}
-.aop-header h1 {
-  font-size: 1.2rem;
-  margin: 0;
-  color: var(--aop-primary);
-}
+.aop-logo { height: 40px; width: auto; }
+.aop-header h1 { font-size: 1.2rem; margin: 0; color: var(--aop-primary); }
 
-/* Form */
+/* ── Search form ────────────────────────────────────── */
 .aop-search-form {
   background: #fff;
   border-radius: 0.5rem;
   box-shadow: 0 1px 4px rgba(0,0,0,.08);
   padding: 1rem 1.25rem;
-  margin-bottom: 1rem;
+  margin-bottom: 0;
 }
-
-/* Primary button */
 .btn-aop {
   background-color: var(--aop-primary);
   border-color: var(--aop-primary-border);
   color: #fff;
 }
-.btn-aop:hover {
-  background-color: var(--aop-primary-hover);
-  color: #fff;
-}
+.btn-aop:hover { background-color: var(--aop-primary-hover); color: #fff; }
 
-/* Autocomplete wrapper */
-.autocomplete-container {
-  position: relative;
-}
+/* ── Autocomplete ───────────────────────────────────── */
+.autocomplete-container { position: relative; }
 .autocomplete-dropdown {
   position: absolute;
   top: 100%;
@@ -70,14 +56,83 @@ body {
   font-size: 0.875rem;
   padding: 0.4rem 0.75rem;
 }
-.autocomplete-dropdown .dropdown-item:hover {
-  background: #f0f0ff;
+.autocomplete-dropdown .dropdown-item:hover,
+.autocomplete-dropdown .active-suggestion {
+  background: #ede9fe;
+  color: var(--aop-primary);
 }
 
-/* Results table */
-.aop-table-wrap {
-  overflow-x: auto;
+/* ── Type badges ────────────────────────────────────── */
+.type-badge {
+  font-size: 0.72rem;
+  padding: 2px 6px;
+  border-radius: 10px;
+  font-weight: 600;
+  display: inline-block;
+  white-space: nowrap;
 }
+.type-aop                  { background: #dbeafe; color: #1e40af; }
+.type-key_event            { background: #fef3c7; color: #92400e; }
+.type-chemical             { background: #fce7f3; color: #9d174d; }
+.type-stressor             { background: #d1fae5; color: #065f46; }
+.type-assay                { background: #ede9fe; color: #5b21b6; }
+.type-biological_process   { background: #cffafe; color: #155e75; }
+.type-biological_object    { background: #e0f2fe; color: #075985; }
+.type-biological_action    { background: #fdf4ff; color: #7e22ce; }
+.type-bio_event_triple     { background: #f0fdf4; color: #14532d; }
+.type-taxonomy             { background: #fff7ed; color: #9a3412; }
+.type-key_event_relationship { background: #f1f5f9; color: #334155; }
+.type-default              { background: #f3f4f6; color: #374151; }
+
+/* ── Facet sidebar ──────────────────────────────────── */
+.facet-sidebar {
+  min-width: 160px;
+  max-width: 180px;
+  flex-shrink: 0;
+  background: #fafafa;
+  border: 1px solid #e5e7eb;
+  border-radius: 0.375rem;
+  padding: 0.75rem;
+  font-size: 0.82rem;
+  height: fit-content;
+}
+.facet-title {
+  font-weight: 600;
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: #6b7280;
+  margin-bottom: 0.5rem;
+}
+.facet-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  background: none;
+  border: none;
+  padding: 0.25rem 0.25rem;
+  border-radius: 0.25rem;
+  cursor: pointer;
+  gap: 0.5rem;
+  text-align: left;
+}
+.facet-item:hover { background: #ede9fe; }
+.facet-item--active { background: #e0e7ff; }
+.facet-count {
+  font-size: 0.75rem;
+  color: #6b7280;
+  margin-left: auto;
+  white-space: nowrap;
+}
+.facet-total {
+  border-top: 1px solid #e5e7eb;
+  margin-top: 0.4rem;
+  padding-top: 0.4rem;
+}
+
+/* ── Results table ──────────────────────────────────── */
+.aop-table-wrap { overflow-x: auto; }
 table.aop-table {
   font-size: 0.85rem;
   width: 100%;
@@ -101,33 +156,94 @@ table.aop-table td {
   overflow: hidden;
   text-overflow: ellipsis;
 }
-table.aop-table tr:hover td {
-  background: #f9f9ff;
-}
+table.aop-table tr:hover td { background: #f9f9ff; }
+table.aop-table tr.row-selected td { background: #ede9fe; }
 
-/* Badges for type_s */
-.type-badge {
-  font-size: 0.72rem;
-  padding: 2px 6px;
-  border-radius: 10px;
-  font-weight: 600;
-  display: inline-block;
+/* ── Column toggle dropdown ─────────────────────────── */
+.col-toggle-dropdown {
+  position: absolute;
+  top: 100%;
+  right: 0;
+  background: #fff;
+  border: 1px solid #dee2e6;
+  border-radius: 0.375rem;
+  box-shadow: 0 4px 12px rgba(0,0,0,.12);
+  padding: 0.5rem;
+  z-index: 200;
+  min-width: 160px;
+}
+.col-toggle-item {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 0.82rem;
+  padding: 0.2rem 0.25rem;
+  cursor: pointer;
   white-space: nowrap;
 }
-.type-aop          { background: #dbeafe; color: #1e40af; }
-.type-key_event    { background: #fef3c7; color: #92400e; }
-.type-chemical     { background: #fce7f3; color: #9d174d; }
-.type-stressor     { background: #d1fae5; color: #065f46; }
-.type-assay        { background: #ede9fe; color: #5b21b6; }
-.type-biological_process { background: #cffafe; color: #155e75; }
-.type-biological_object  { background: #e0f2fe; color: #075985; }
-.type-biological_action  { background: #fdf4ff; color: #7e22ce; }
-.type-bio_event_triple   { background: #f0fdf4; color: #14532d; }
-.type-taxonomy           { background: #fff7ed; color: #9a3412; }
-.type-key_event_relationship { background: #f1f5f9; color: #334155; }
-.type-default { background: #f3f4f6; color: #374151; }
+.col-toggle-item:hover { background: #f3f4f6; border-radius: 0.25rem; }
 
-/* Network graph container */
+/* ── Detail panel ───────────────────────────────────── */
+.detail-panel {
+  background: #fff;
+  border: 1px solid #e5e7eb;
+  border-radius: 0.5rem;
+  padding: 1rem;
+  font-size: 0.83rem;
+  overflow-y: auto;
+  max-height: 80vh;
+  box-shadow: 0 2px 8px rgba(0,0,0,.08);
+}
+.detail-panel__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 0.5rem;
+  gap: 0.5rem;
+}
+.detail-id {
+  font-weight: 700;
+  font-size: 1rem;
+  color: var(--aop-primary);
+}
+.detail-panel__title {
+  font-size: 0.95rem;
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+  line-height: 1.4;
+}
+.detail-panel__desc {
+  font-size: 0.82rem;
+  color: #374151;
+  background: #f9fafb;
+  border-left: 3px solid var(--aop-primary);
+  padding: 0.5rem 0.75rem;
+  margin-bottom: 0.75rem;
+  border-radius: 0 0.25rem 0.25rem 0;
+  max-height: 150px;
+  overflow-y: auto;
+}
+.detail-panel__table { width: 100%; border-collapse: collapse; }
+.detail-panel__table th {
+  text-align: left;
+  font-weight: 600;
+  color: #6b7280;
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  padding: 0.3rem 0.5rem 0.3rem 0;
+  width: 38%;
+  vertical-align: top;
+  white-space: nowrap;
+}
+.detail-panel__table td {
+  padding: 0.3rem 0;
+  word-break: break-word;
+  color: #111827;
+}
+.detail-panel__table tr { border-bottom: 1px solid #f3f4f6; }
+
+/* ── Network graph ──────────────────────────────────── */
 #aop-network {
   width: 100%;
   height: 580px;
@@ -136,13 +252,16 @@ table.aop-table tr:hover td {
   background: #fff;
 }
 
-/* Tabs */
+/* ── Tabs ───────────────────────────────────────────── */
 .aop-tabs .nav-link.active {
   color: var(--aop-primary);
   border-bottom-color: var(--aop-primary);
 }
+.aop-tabs .nav-link {
+  color: #6b7280;
+}
 
-/* Debug */
+/* ── Debug ──────────────────────────────────────────── */
 pre.debug-pre {
   font-size: 0.78rem;
   max-height: 400px;
@@ -153,25 +272,20 @@ pre.debug-pre {
   padding: 0.75rem;
 }
 
-/* Example queries */
-.example-btn {
-  font-size: 0.82rem;
-}
-
-/* Pagination */
+/* ── Pagination ─────────────────────────────────────── */
 .aop-pagination .page-item.active .page-link {
   background-color: var(--aop-primary);
   border-color: var(--aop-primary);
 }
-.aop-pagination .page-link {
-  color: var(--aop-primary);
-}
+.aop-pagination .page-link { color: var(--aop-primary); }
 
-/* Footer */
+/* ── Footer ─────────────────────────────────────────── */
 .aop-footer {
   background: #f8f9fa;
   border-top: 1px solid #dee2e6;
   padding: 0.75rem 1rem;
   font-size: 0.8rem;
-  margin-top: 2rem;
 }
+
+/* ── Utility ────────────────────────────────────────── */
+.min-w-0 { min-width: 0; }

@@ -2,19 +2,19 @@ import AutocompleteInput from './AutocompleteInput.jsx';
 import { TYPE_LABELS } from '../utils/aopLinks.js';
 
 const GRAPH_OPTIONS = [
-  { value: '999',  label: 'Upstream (ALL)' },
-  { value: '5',    label: 'Upstream 5' },
-  { value: '4',    label: 'Upstream 4' },
-  { value: '3',    label: 'Upstream 3' },
-  { value: '2',    label: 'Upstream 2' },
-  { value: '1',    label: 'Upstream 1' },
-  { value: '0',    label: 'None' },
-  { value: '-1',   label: 'Downstream -1' },
-  { value: '-2',   label: 'Downstream -2' },
-  { value: '-3',   label: 'Downstream -3' },
-  { value: '-4',   label: 'Downstream -4' },
-  { value: '-5',   label: 'Downstream -5' },
-  { value: '-999', label: 'Downstream (ALL)' },
+  { value: '999',         label: 'Upstream (ALL)' },
+  { value: '5',           label: 'Upstream 5' },
+  { value: '4',           label: 'Upstream 4' },
+  { value: '3',           label: 'Upstream 3' },
+  { value: '2',           label: 'Upstream 2' },
+  { value: '1',           label: 'Upstream 1' },
+  { value: '0',           label: 'None' },
+  { value: '-1',          label: 'Downstream -1' },
+  { value: '-2',          label: 'Downstream -2' },
+  { value: '-3',          label: 'Downstream -3' },
+  { value: '-4',          label: 'Downstream -4' },
+  { value: '-5',          label: 'Downstream -5' },
+  { value: '-999',        label: 'Downstream (ALL)' },
   { value: 'AOP',         label: 'AOP graph' },
   { value: 'AOPextended', label: 'AOP extended' },
   { value: 'MIE',         label: 'MIE by AOP' },
@@ -38,12 +38,20 @@ export default function SearchForm({ state, onChange, onSubmit }) {
     onChange({ types: next });
   }
 
+  function selectAllTypes() {
+    onChange({ types: Object.keys(TYPE_LABELS) });
+  }
+
+  function clearAllTypes() {
+    onChange({ types: [] });
+  }
+
   return (
     <form
       className="aop-search-form"
       onSubmit={e => { e.preventDefault(); onSubmit(); }}
     >
-      {/* Row 1: free text, ID, graph, submit */}
+      {/* Row 1 */}
       <div className="mb-3 row align-items-end g-2">
         <div className="col-md-5">
           <label htmlFor="q" className="form-label">Free text search</label>
@@ -56,9 +64,9 @@ export default function SearchForm({ state, onChange, onSubmit }) {
             onChange={e => onChange({ q: e.target.value })}
           />
         </div>
-
         <div className="col-md-2">
-          <label htmlFor="fieldId" className="form-label" title="AOP Wiki identifier e.g. AOP144, KE1696, KER1">ID</label>
+          <label htmlFor="fieldId" className="form-label"
+            title="AOP Wiki identifier e.g. AOP144, KE1696, KER1">ID</label>
           <input
             type="text"
             id="fieldId"
@@ -68,7 +76,6 @@ export default function SearchForm({ state, onChange, onSubmit }) {
             onChange={e => onChange({ fieldId: e.target.value })}
           />
         </div>
-
         <div className="col-md-2">
           <label htmlFor="graph" className="form-label">Graph Traversal</label>
           <select
@@ -82,16 +89,13 @@ export default function SearchForm({ state, onChange, onSubmit }) {
             ))}
           </select>
         </div>
-
         <div className="col-md-3 d-flex align-items-end gap-2">
           <button type="submit" className="btn btn-aop">
-            <i className="fa fa-search me-1" /> AOP Wiki Search
+            <i className="fa fa-search me-1" />AOP Wiki Search
           </button>
           <a
             href="https://forms.gle/h6xwjhzeqshjh53p7"
-            target="_blank"
-            rel="noreferrer"
-            className="ms-1"
+            target="_blank" rel="noreferrer"
             title="Feedback"
             style={{ color: 'var(--aop-primary)', fontSize: '1.2rem' }}
           >
@@ -101,173 +105,87 @@ export default function SearchForm({ state, onChange, onSubmit }) {
       </div>
 
       {/* Row 2: KE filters */}
-      <div className="mb-3 row g-2" title="KE filters">
+      <div className="mb-3 row g-2" title="Key event filters">
         <div className="col-md-2">
-          <AutocompleteInput
-            id="field_biological_object_ids_ss"
-            name="field_biological_object_ids_ss"
-            label="Biological Object"
+          <AutocompleteInput id="field_bio_obj" name="field_bio_obj" label="Biological Object"
             placeholder="type for suggestions"
-            value={filters.biological_object_ids_ss || ''}
-            onChange={v => setFilter('biological_object_ids_ss', v)}
-            mode="doc"
-            labelField="name_t"
-            codeField="id"
-            fq="type_s:(biological_object)"
-          />
+            value={filters.biological_object_ids_ss || ''} onChange={v => setFilter('biological_object_ids_ss', v)}
+            mode="doc" labelField="name_t" codeField="id" fq="type_s:(biological_object)" />
         </div>
         <div className="col-md-2">
-          <AutocompleteInput
-            id="field_biological_process_ids_ss"
-            name="field_biological_process_ids_ss"
-            label="Biological Process"
+          <AutocompleteInput id="field_bio_proc" name="field_bio_proc" label="Biological Process"
             placeholder="type for suggestions"
-            value={filters.biological_process_ids_ss || ''}
-            onChange={v => setFilter('biological_process_ids_ss', v)}
-            mode="doc"
-            labelField="name_t"
-            codeField="id"
-            fq="type_s:(biological_process)"
-          />
+            value={filters.biological_process_ids_ss || ''} onChange={v => setFilter('biological_process_ids_ss', v)}
+            mode="doc" labelField="name_t" codeField="id" fq="type_s:(biological_process)" />
         </div>
         <div className="col-md-2">
-          <AutocompleteInput
-            id="field_biological_action_ids_ss"
-            name="field_biological_action_ids_ss"
-            label="Biological Action"
+          <AutocompleteInput id="field_bio_act" name="field_bio_act" label="Biological Action"
             placeholder="type for suggestions"
-            value={filters.biological_action_ids_ss || ''}
-            onChange={v => setFilter('biological_action_ids_ss', v)}
-            mode="doc"
-            labelField="name_t"
-            codeField="id"
-            fq="type_s:(biological_action)"
-          />
+            value={filters.biological_action_ids_ss || ''} onChange={v => setFilter('biological_action_ids_ss', v)}
+            mode="doc" labelField="name_t" codeField="id" fq="type_s:(biological_action)" />
         </div>
         <div className="col-md-2">
-          <AutocompleteInput
-            id="field_biological_organization_level_t"
-            name="field_biological_organization_level_t"
-            label="Biological Organisation"
+          <AutocompleteInput id="field_bio_org" name="field_bio_org" label="Biological Organisation"
             placeholder="type for suggestions"
-            value={filters.biological_organization_level_t || ''}
-            onChange={v => setFilter('biological_organization_level_t', v)}
-            mode="facet"
-            facetField="biological_organization_level_t"
-          />
+            value={filters.biological_organization_level_t || ''} onChange={v => setFilter('biological_organization_level_t', v)}
+            mode="facet" facetField="biological_organization_level_t" />
         </div>
         <div className="col-md-2">
-          <AutocompleteInput
-            id="field_attr_organ_term"
-            name="field_attr_organ_term"
-            label="Organ"
+          <AutocompleteInput id="field_organ" name="field_organ" label="Organ"
             placeholder="type for suggestions"
-            value={filters.attr_organ_term || ''}
-            onChange={v => setFilter('attr_organ_term', v)}
-            mode="facet"
-            facetField="attr_organ_term"
-          />
+            value={filters.attr_organ_term || ''} onChange={v => setFilter('attr_organ_term', v)}
+            mode="facet" facetField="attr_organ_term" />
         </div>
         <div className="col-md-2">
-          <AutocompleteInput
-            id="field_attr_cell_term"
-            name="field_attr_cell_term"
-            label="Cell"
+          <AutocompleteInput id="field_cell" name="field_cell" label="Cell"
             placeholder="type for suggestions"
-            value={filters.attr_cell_term || ''}
-            onChange={v => setFilter('attr_cell_term', v)}
-            mode="facet"
-            facetField="attr_cell_term"
-          />
+            value={filters.attr_cell_term || ''} onChange={v => setFilter('attr_cell_term', v)}
+            mode="facet" facetField="attr_cell_term" />
         </div>
       </div>
 
       {/* Row 3: more filters */}
       <div className="mb-3 row g-2">
         <div className="col-md-2">
-          <AutocompleteInput
-            id="field_attr_applicability_taxonomy"
-            name="field_attr_applicability_taxonomy"
-            label="Applicability taxonomy"
+          <AutocompleteInput id="field_taxonomy" name="field_taxonomy" label="Applicability taxonomy"
             placeholder="e.g., human"
-            value={filters.attr_applicability_taxonomy || ''}
-            onChange={v => setFilter('attr_applicability_taxonomy', v)}
-            mode="doc"
-            labelField="attr_applicability_taxonomy"
-            fq="type_s:aop"
-          />
+            value={filters.attr_applicability_taxonomy || ''} onChange={v => setFilter('attr_applicability_taxonomy', v)}
+            mode="doc" labelField="attr_applicability_taxonomy" fq="type_s:aop" />
         </div>
         <div className="col-md-2">
-          <AutocompleteInput
-            id="field_molecular_initiating_event_ss"
-            name="field_molecular_initiating_event_ss"
-            label="MIE"
+          <AutocompleteInput id="field_mie" name="field_mie" label="MIE"
             placeholder="e.g. KE1495"
-            value={filters.molecular_initiating_event_ss || ''}
-            onChange={v => setFilter('molecular_initiating_event_ss', v)}
-            mode="doc"
-            labelField="title_t"
-            codeField="id"
-            fq="type_s:key_event AND MIE_ss:*"
-          />
+            value={filters.molecular_initiating_event_ss || ''} onChange={v => setFilter('molecular_initiating_event_ss', v)}
+            mode="doc" labelField="title_t" codeField="id" fq="type_s:key_event AND MIE_ss:*" />
         </div>
         <div className="col-md-2">
-          <AutocompleteInput
-            id="field_adverse_outcome_ss"
-            name="field_adverse_outcome_ss"
-            label="Adverse Outcomes"
+          <AutocompleteInput id="field_ao" name="field_ao" label="Adverse Outcomes"
             placeholder="e.g. KE1458"
-            value={filters.adverse_outcome_ss || ''}
-            onChange={v => setFilter('adverse_outcome_ss', v)}
-            mode="doc"
-            labelField="title_t"
-            codeField="id"
-            fq="type_s:(key_event aop) AND adverse_outcome_ss:*"
-          />
+            value={filters.adverse_outcome_ss || ''} onChange={v => setFilter('adverse_outcome_ss', v)}
+            mode="doc" labelField="title_t" codeField="id" fq="type_s:(key_event aop) AND adverse_outcome_ss:*" />
         </div>
         <div className="col-md-2">
-          <AutocompleteInput
-            id="field_attr_assays"
-            name="field_attr_assays"
-            label="Measurement Methodology"
+          <AutocompleteInput id="field_assay" name="field_assay" label="Measurement Methodology"
             placeholder="e.g., DAPI"
-            value={filters.attr_assays || ''}
-            onChange={v => setFilter('attr_assays', v)}
-            mode="doc"
-            labelField="name_t"
-            fq="type_s:assay"
-          />
+            value={filters.attr_assays || ''} onChange={v => setFilter('attr_assays', v)}
+            mode="doc" labelField="name_t" fq="type_s:assay" />
         </div>
         <div className="col-md-2">
-          <AutocompleteInput
-            id="field_casrn_s"
-            name="field_casrn_s"
-            label="Chemical name/CAS RN"
+          <AutocompleteInput id="field_cas" name="field_cas" label="Chemical name/CAS RN"
             placeholder="e.g., 134098-61-6"
-            value={filters.casrn_s || ''}
-            onChange={v => setFilter('casrn_s', v)}
-            mode="doc"
-            labelField="preferred_name_t"
-            codeField="casrn_s"
-            fq="type_s:chemical"
-          />
+            value={filters.casrn_s || ''} onChange={v => setFilter('casrn_s', v)}
+            mode="doc" labelField="preferred_name_t" codeField="casrn_s" fq="type_s:chemical" />
         </div>
         <div className="col-md-2">
-          <AutocompleteInput
-            id="field_doi_ss"
-            name="field_doi_ss"
-            label="DOI"
+          <AutocompleteInput id="field_doi" name="field_doi" label="DOI"
             placeholder="e.g. 10.3389/ftox.2021.653386"
-            value={filters.doi_ss || ''}
-            onChange={v => setFilter('doi_ss', v)}
-            mode="facet"
-            facetField="doi_ss"
-          />
+            value={filters.doi_ss || ''} onChange={v => setFilter('doi_ss', v)}
+            mode="facet" facetField="doi_ss" />
         </div>
       </div>
 
-      {/* Row 4: result type checkboxes */}
-      <div className="mb-1 row align-items-center g-2">
+      {/* Row 4: result types */}
+      <div className="mb-0 row align-items-center g-2">
         <div className="col-auto">
           <span className="form-label mb-0 fw-semibold">Result types</span>
         </div>
@@ -281,12 +199,16 @@ export default function SearchForm({ state, onChange, onSubmit }) {
                 checked={types.includes(value)}
                 onChange={() => toggleType(value)}
               />
-              <label className="form-check-label" htmlFor={`type_${value}`}>
-                {label}
-              </label>
+              <label className="form-check-label" htmlFor={`type_${value}`}>{label}</label>
             </div>
           </div>
         ))}
+        <div className="col-auto ms-2 d-flex gap-1">
+          <button type="button" className="btn btn-sm btn-outline-secondary py-0"
+            onClick={selectAllTypes}>All</button>
+          <button type="button" className="btn btn-sm btn-outline-secondary py-0"
+            onClick={clearAllTypes}>None</button>
+        </div>
       </div>
     </form>
   );

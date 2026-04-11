@@ -2,13 +2,16 @@ import { useState, useRef, useEffect, useCallback } from 'react';
 import { fetchFacetSuggestions, fetchDocSuggestions } from '../utils/solr.js';
 
 /**
+ * Accessible autocomplete input.
+ * Keyboard: ArrowDown/Up navigate, Enter selects, Escape closes.
+ *
  * Props:
- *  id, name, label, placeholder
- *  value, onChange
- *  mode: 'facet' | 'doc'
- *  facetField        (mode=facet)
- *  labelField, codeField, fq  (mode=doc)
- *  minChars (default 2)
+ *   id, name, label, placeholder
+ *   value, onChange(string)
+ *   mode: 'facet' | 'doc'
+ *   facetField              (mode=facet)
+ *   labelField, codeField, fq  (mode=doc)
+ *   minChars (default 2)
  */
 export default function AutocompleteInput({
   id, name, label, placeholder,
@@ -20,25 +23,27 @@ export default function AutocompleteInput({
 }) {
   const [suggestions, setSuggestions] = useState([]);
   const [open, setOpen] = useState(false);
+  const [focused, setFocused] = useState(-1);
   const debounceRef = useRef(null);
   const containerRef = useRef(null);
+  const listRef = useRef(null);
+  const listboxId = `${id}-listbox`;
 
   const fetchSuggestions = useCallback(async (query) => {
     try {
-      let results;
-      if (mode === 'facet') {
-        results = await fetchFacetSuggestions(facetField, query);
-      } else {
-        results = await fetchDocSuggestions(labelField, codeField, fq, query);
-      }
+      const results = mode === 'facet'
+        ? await fetchFacetSuggestions(facetField, query)
+        : await fetchDocSuggestions(labelField, codeField, fq, query);
       setSuggestions(results);
       setOpen(results.length > 0);
+      setFocused(-1);
     } catch {
       setSuggestions([]);
+      setOpen(false);
     }
   }, [mode, facetField, labelField, codeField, fq]);
 
-  function handleInput(e) {
+  function handleChange(e) {
     const val = e.target.value;
     onChange(val);
     clearTimeout(debounceRef.current);
@@ -54,7 +59,40 @@ export default function AutocompleteInput({
     onChange(val);
     setOpen(false);
     setSuggestions([]);
+    setFocused(-1);
   }
+
+  function handleKeyDown(e) {
+    if (!open) return;
+    switch (e.key) {
+      case 'ArrowDown':
+        e.preventDefault();
+        setFocused(f => Math.min(f + 1, suggestions.length - 1));
+        break;
+      case 'ArrowUp':
+        e.preventDefault();
+        setFocused(f => Math.max(f - 1, -1));
+        break;
+      case 'Enter':
+        e.preventDefault();
+        if (focused >= 0 && suggestions[focused]) handleSelect(suggestions[focused]);
+        break;
+      case 'Escape':
+        setOpen(false);
+        setFocused(-1);
+        break;
+      default:
+        break;
+    }
+  }
+
+  // Scroll focused item into view
+  useEffect(() => {
+    if (focused >= 0 && listRef.current) {
+      const item = listRef.current.children[focused];
+      item?.scrollIntoView({ block: 'nearest' });
+    }
+  }, [focused]);
 
   // Close on outside click
   useEffect(() => {
@@ -69,7 +107,9 @@ export default function AutocompleteInput({
 
   return (
     <div className="d-flex flex-column autocomplete-container" ref={containerRef}>
-      {label && <label htmlFor={id} className="form-label">{label}</label>}
+      {label && (
+        <label htmlFor={id} className="form-label">{label}</label>
+      )}
       <input
         type="text"
         id={id}
@@ -77,22 +117,37 @@ export default function AutocompleteInput({
         className="form-control"
         placeholder={placeholder}
         value={value}
-        onChange={handleInput}
-        autoComplete="off"
+        onChange={handleChange}
+        onKeyDown={handleKeyDown}
         onFocus={() => suggestions.length > 0 && setOpen(true)}
+        autoComplete="off"
+        aria-autocomplete="list"
+        aria-controls={open ? listboxId : undefined}
+        aria-activedescendant={focused >= 0 ? `${id}-opt-${focused}` : undefined}
+        aria-expanded={open}
+        role="combobox"
       />
       {open && (
-        <div className="autocomplete-dropdown">
+        <ul
+          id={listboxId}
+          ref={listRef}
+          role="listbox"
+          className="autocomplete-dropdown list-unstyled mb-0"
+        >
           {suggestions.map((s, i) => (
-            <div
+            <li
               key={i}
-              className="dropdown-item"
+              id={`${id}-opt-${i}`}
+              role="option"
+              aria-selected={i === focused}
+              className={`dropdown-item${i === focused ? ' active-suggestion' : ''}`}
               onMouseDown={() => handleSelect(s)}
+              onMouseEnter={() => setFocused(i)}
             >
               {s}
-            </div>
+            </li>
           ))}
-        </div>
+        </ul>
       )}
     </div>
   );
