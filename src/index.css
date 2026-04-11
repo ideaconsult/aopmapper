@@ -1,0 +1,177 @@
+:root {
+  --aop-primary: #6366f1;
+  --aop-primary-border: #818cf8;
+  --aop-primary-hover: #4f46e5;
+}
+
+body {
+  font-family: system-ui, -apple-system, sans-serif;
+  background: #f8f9fa;
+}
+
+/* Header */
+.aop-header {
+  background: #fff;
+  border-bottom: 1px solid #e5e7eb;
+  padding: 0.5rem 1rem;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+.aop-logo {
+  height: 40px;
+  width: auto;
+}
+.aop-header h1 {
+  font-size: 1.2rem;
+  margin: 0;
+  color: var(--aop-primary);
+}
+
+/* Form */
+.aop-search-form {
+  background: #fff;
+  border-radius: 0.5rem;
+  box-shadow: 0 1px 4px rgba(0,0,0,.08);
+  padding: 1rem 1.25rem;
+  margin-bottom: 1rem;
+}
+
+/* Primary button */
+.btn-aop {
+  background-color: var(--aop-primary);
+  border-color: var(--aop-primary-border);
+  color: #fff;
+}
+.btn-aop:hover {
+  background-color: var(--aop-primary-hover);
+  color: #fff;
+}
+
+/* Autocomplete wrapper */
+.autocomplete-container {
+  position: relative;
+}
+.autocomplete-dropdown {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  background: #fff;
+  border: 1px solid #dee2e6;
+  border-radius: 0.25rem;
+  max-height: 200px;
+  overflow-y: auto;
+  z-index: 1050;
+  box-shadow: 0 2px 6px rgba(0,0,0,.12);
+}
+.autocomplete-dropdown .dropdown-item {
+  cursor: pointer;
+  font-size: 0.875rem;
+  padding: 0.4rem 0.75rem;
+}
+.autocomplete-dropdown .dropdown-item:hover {
+  background: #f0f0ff;
+}
+
+/* Results table */
+.aop-table-wrap {
+  overflow-x: auto;
+}
+table.aop-table {
+  font-size: 0.85rem;
+  width: 100%;
+  border-collapse: collapse;
+}
+table.aop-table th {
+  background: #f3f4f6;
+  position: sticky;
+  top: 0;
+  cursor: pointer;
+  user-select: none;
+  white-space: nowrap;
+  padding: 0.5rem 0.75rem;
+  border-bottom: 2px solid #dee2e6;
+}
+table.aop-table td {
+  padding: 0.4rem 0.75rem;
+  border-bottom: 1px solid #f0f0f0;
+  vertical-align: top;
+  max-width: 300px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+table.aop-table tr:hover td {
+  background: #f9f9ff;
+}
+
+/* Badges for type_s */
+.type-badge {
+  font-size: 0.72rem;
+  padding: 2px 6px;
+  border-radius: 10px;
+  font-weight: 600;
+  display: inline-block;
+  white-space: nowrap;
+}
+.type-aop          { background: #dbeafe; color: #1e40af; }
+.type-key_event    { background: #fef3c7; color: #92400e; }
+.type-chemical     { background: #fce7f3; color: #9d174d; }
+.type-stressor     { background: #d1fae5; color: #065f46; }
+.type-assay        { background: #ede9fe; color: #5b21b6; }
+.type-biological_process { background: #cffafe; color: #155e75; }
+.type-biological_object  { background: #e0f2fe; color: #075985; }
+.type-biological_action  { background: #fdf4ff; color: #7e22ce; }
+.type-bio_event_triple   { background: #f0fdf4; color: #14532d; }
+.type-taxonomy           { background: #fff7ed; color: #9a3412; }
+.type-key_event_relationship { background: #f1f5f9; color: #334155; }
+.type-default { background: #f3f4f6; color: #374151; }
+
+/* Network graph container */
+#aop-network {
+  width: 100%;
+  height: 580px;
+  border: 1px solid #dee2e6;
+  border-radius: 0.25rem;
+  background: #fff;
+}
+
+/* Tabs */
+.aop-tabs .nav-link.active {
+  color: var(--aop-primary);
+  border-bottom-color: var(--aop-primary);
+}
+
+/* Debug */
+pre.debug-pre {
+  font-size: 0.78rem;
+  max-height: 400px;
+  overflow: auto;
+  background: #f8f9fa;
+  border: 1px solid #dee2e6;
+  border-radius: 0.25rem;
+  padding: 0.75rem;
+}
+
+/* Example queries */
+.example-btn {
+  font-size: 0.82rem;
+}
+
+/* Pagination */
+.aop-pagination .page-item.active .page-link {
+  background-color: var(--aop-primary);
+  border-color: var(--aop-primary);
+}
+.aop-pagination .page-link {
+  color: var(--aop-primary);
+}
+
+/* Footer */
+.aop-footer {
+  background: #f8f9fa;
+  border-top: 1px solid #dee2e6;
+  padding: 0.75rem 1rem;
+  font-size: 0.8rem;
+  margin-top: 2rem;
+}
