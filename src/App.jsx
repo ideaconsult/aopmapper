@@ -60,7 +60,7 @@ export default function App() {
       <header className="aop-header">
         <a href="/aop/" aria-label="AOP Mapper home">
           <img
-            src="/assets/img/logo-aopmapper.svg"
+            src={`${import.meta.env.BASE_URL}assets/img/logo-aopmapper.svg`}
             alt="AOP Mapper logo"
             className="aop-logo"
             onError={e => { e.currentTarget.style.display = 'none'; }}
