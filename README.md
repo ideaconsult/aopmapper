@@ -1,6 +1,6 @@
 
 ```
-npm install
-npm run dev        # dev server at http://localhost:3000/aop/
-npm run build      # builds to dist/
+pnpm install
+pnpm run dev        # dev server at http://localhost:3000/aop/
+pnpm run build      # builds to dist/
 ```
