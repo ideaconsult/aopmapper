@@ -1,4 +1,4 @@
-FROM node:24.14.1-slim AS pnpm-stage
+FROM node:25.9.0-slim AS pnpm-stage
 
 ENV PNPM_HOME="/pnpm"
 ENV PATH="$PNPM_HOME:$PATH"
