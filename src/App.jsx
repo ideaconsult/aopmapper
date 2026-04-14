@@ -92,7 +92,7 @@ function AopMapper() {
     <div className="d-flex flex-column min-vh-100">
       {/* Header */}
       <header className="aop-header">
-        <a href="/aop/" aria-label="AOP Mapper home">
+        <a href="./" aria-label="AOP Mapper home">
           <img
             src={`${import.meta.env.BASE_URL}assets/img/logo-aopmapper.svg`}
             alt="AOP Mapper"
@@ -219,7 +219,7 @@ function AopMapper() {
           <div className={`tab-pane p-3 ${activeTab === 'help' ? 'show active' : ''}`}>
             <h2 className="h5">Help</h2>
             <p>
-              <a href="/aop/help.html" target="_blank" rel="noreferrer">
+              <a href="./help.html" target="_blank" rel="noreferrer">
                 <i className="fa fa-book me-1" />AOP Mapper User Guide
               </a>
             </p>
@@ -259,7 +259,7 @@ function AopMapper() {
 
 export default function App() {
   return (
-    <BrowserRouter basename="/aop">
+    <BrowserRouter>
       <Routes>
         <Route path="/*" element={<AopMapper />} />
       </Routes>
