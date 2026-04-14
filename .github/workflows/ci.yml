@@ -54,14 +54,13 @@ jobs:
         with:
           images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
           labels: |
-            org.opencontainers.image.description=Template Designer Service
-            org.opencontainers.image.licenses=MIT
+            org.opencontainers.image.description=AOP Mapper
+            org.opencontainers.image.licenses=TBD
             org.opencontainers.image.title=template-designer
-            org.opencontainers.image.url=https://github.com/ideaconsult/templateforge/blob/main/README.md
+            org.opencontainers.image.url=${{ github.server_url }}/${{ github.repository }}/blob/main/README.md
             org.opencontainers.image.vendor=IDEAconsult
           tags: |
-            type=raw,value=latest,enable=${{ github.ref == 'refs/heads/develop' }}
-            type=raw,value=stable,enable=${{ github.ref == 'refs/heads/main' }}
+            type=raw,value=latest,enable=${{ github.ref == 'refs/heads/main' }}
             type=ref,event=branch
             type=ref,event=tag
             type=ref,event=pr
