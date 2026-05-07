@@ -1,4 +1,4 @@
-import { useState, useCallback, useRef } from 'react';
+import { useState, useCallback, useRef, useEffect } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { buildSolrParams, fetchSolrPage, fetchAllResults } from '../utils/solr.js';
 
@@ -96,6 +96,22 @@ export function useAopSearch() {
     setSolrParams(params);
     return params;
   }, [formState, setSearchParams]);
+
+  // -----------------------------------------------------------------------
+  // Auto-search on mount when URL already contains query parameters.
+  // This makes shared/bookmarked URLs (e.g. /?fieldId=AOP144&graph=AOP)
+  // execute immediately without requiring the user to click Search.
+  // -----------------------------------------------------------------------
+  const didAutoSearch = useRef(false);
+  useEffect(() => {
+    if (didAutoSearch.current) return;
+    didAutoSearch.current = true;
+    if (searchParams.toString() !== '') {
+      const initialState = stateFromParams(searchParams);
+      search(initialState);
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []); // intentionally empty — runs once on mount only
 
   /** Fetch a page (called by ResultsTable) */
   const fetchPage = useCallback(async (params, start, rows, sortField, sortDir) => {
