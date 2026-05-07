@@ -1,2 +1,467 @@
 <!DOCTYPE html>
-TBA
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AOP Mapper – User Guide</title>
+  <meta name="description" content="User guide for AOP Mapper" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.3/css/bootstrap.min.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+  <style>
+    body { padding: 2rem 0 4rem; color: #212529; }
+    h1 { margin-bottom: 1.5rem; }
+    h2 { margin-top: 2.5rem; border-bottom: 1px solid #dee2e6; padding-bottom: .4rem; }
+    h3 { margin-top: 1.8rem; }
+    table { width: 100%; margin-bottom: 1.25rem; font-size: .9rem; }
+    th { background: #f8f9fa; }
+    code { background: #f1f3f5; padding: .1em .35em; border-radius: 3px; font-size: .88em; }
+    pre code { background: none; padding: 0; font-size: .85em; }
+    pre { background: #f1f3f5; padding: 1rem; border-radius: 6px; overflow-x: auto; }
+    .back-link { font-size: .9rem; }
+  </style>
+</head>
+<body>
+  <div class="container" style="max-width:860px">
+    <p class="back-link mb-4">
+      <a href="./"><i class="fa fa-arrow-left me-1"></i>Back to AOP Mapper</a>
+    </p>
+    <h1>AOP Mapper User Guide</h1>
+<p><strong>AOP Mapper</strong> URL: <a href="https://aop.adma.ai">https://aop.adma.ai/</a></p>
+<h2>Overview</h2>
+<p>The AOP Mapper is an interactive web tool for exploring and querying the <a href="https://aopwiki.org">AOP-Wiki</a> knowledge base. It enables users to search, filter, and visualise relationships among all AOP-Wiki object types: Adverse Outcome Pathways (AOPs), Molecular Initiating Events (MIEs), Key Events (KEs), Key Event Relationships (KERs), Key Event Components (biological objects, processes, and actions), Adverse Outcomes (AOs), chemicals, stressors, assays, and taxonomy applicability entries.</p>
+<h3>Implementation</h3>
+<p>AOP Mapper is a React single-page application that queries an <a href="https://solr.apache.org/">Apache Solr</a> index built from the AOP-Wiki XML export (version <strong>{{aop_version}}</strong>), available at <a href="https://aopwiki.org/downloads">https://aopwiki.org/downloads</a>. The index is built by a separate Python preprocessing pipeline.</p>
+<p>Search state is fully encoded in the browser URL, so any query can be bookmarked or shared as a link. Loading a URL with query parameters automatically executes the search.</p>
+<hr>
+<h2>Search Form</h2>
+<p>The search form at the top of the page is organised in four rows.</p>
+<h3>Row 1 — Free text, ID, and graph traversal</h3>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>Free text search</strong></td>
+<td>Full-text search across all indexed fields. Accepts plain keywords or Solr query syntax (e.g. <code>type_s:(stressor OR chemical) AND nano*</code>). Leave empty to match all documents.</td>
+</tr>
+<tr>
+<td><strong>ID</strong></td>
+<td>Exact AOP-Wiki object identifier, e.g. <code>AOP144</code>, <code>KE1696</code>, <code>KER1</code>. Matched against the <code>id</code> field. Can be combined with free text.</td>
+</tr>
+<tr>
+<td><strong>Graph Traversal</strong></td>
+<td>Extends the result set by traversing the AOP network. See <a href="#graph-traversal-options">Graph Traversal Options</a> below.</td>
+</tr>
+<tr>
+<td><strong>AOP Wiki Search</strong></td>
+<td>Executes the search with all current form values.</td>
+</tr>
+<tr>
+<td><strong>💬</strong></td>
+<td>Opens the feedback form.</td>
+</tr>
+</tbody></table>
+<h3>Row 2 — Key Event filters</h3>
+<p>All fields in this row use autocomplete: type at least two characters to see suggestions, then select from the dropdown. Selecting a value adds it as a filter (<code>AND</code> clause) to the query.</p>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Solr field</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>Biological Object</strong></td>
+<td><code>biological_object_ids_ss</code></td>
+<td>Biological object component of a key event (e.g. <em>mitochondria</em>, <em>DNA</em>).</td>
+</tr>
+<tr>
+<td><strong>Biological Process</strong></td>
+<td><code>biological_process_ids_ss</code></td>
+<td>Biological process component of a key event (e.g. <em>oxidative phosphorylation</em>).</td>
+</tr>
+<tr>
+<td><strong>Biological Action</strong></td>
+<td><code>biological_action_ids_ss</code></td>
+<td>Biological action component of a key event (e.g. <em>increased</em>, <em>decreased</em>).</td>
+</tr>
+<tr>
+<td><strong>Biological Organisation</strong></td>
+<td><code>biological_organization_level_t</code></td>
+<td>Level of biological organisation (e.g. <em>molecular</em>, <em>cellular</em>, <em>organ</em>).</td>
+</tr>
+<tr>
+<td><strong>Organ</strong></td>
+<td><code>attr_organ_term</code></td>
+<td>Organ or tissue to which the KE applies (e.g. <em>liver</em>, <em>lung</em>).</td>
+</tr>
+<tr>
+<td><strong>Cell</strong></td>
+<td><code>attr_cell_term</code></td>
+<td>Cell type associated with the KE (e.g. <em>hepatocyte</em>, <em>macrophage</em>).</td>
+</tr>
+</tbody></table>
+<h3>Row 3 — Additional filters</h3>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Solr field</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>Applicability taxonomy</strong></td>
+<td><code>attr_applicability_taxonomy</code></td>
+<td>Species or taxon applicability (e.g. <em>human</em>, <em>rat</em>, <em>zebrafish</em>).</td>
+</tr>
+<tr>
+<td><strong>MIE</strong></td>
+<td><code>molecular_initiating_event_ss</code></td>
+<td>Filter AOPs by a specific Molecular Initiating Event. Type a KE title or ID (e.g. <code>KE1495</code>).</td>
+</tr>
+<tr>
+<td><strong>Adverse Outcomes</strong></td>
+<td><code>adverse_outcome_ss</code></td>
+<td>Filter AOPs by a specific Adverse Outcome. Type a KE title or ID (e.g. <code>KE1458</code>).</td>
+</tr>
+<tr>
+<td><strong>Measurement Methodology</strong></td>
+<td><code>attr_assays</code></td>
+<td>Assay or measurement method associated with a key event (e.g. <code>DAPI</code>, <code>ELISA</code>).</td>
+</tr>
+<tr>
+<td><strong>Chemical name/CAS RN</strong></td>
+<td><code>casrn_s</code></td>
+<td>Chemical name or CAS registry number of a stressor (e.g. <code>134098-61-6</code>).</td>
+</tr>
+<tr>
+<td><strong>DOI</strong></td>
+<td><code>doi_ss</code></td>
+<td>Filter to items citing a specific publication by DOI (e.g. <code>10.3389/ftox.2021.653386</code>).</td>
+</tr>
+</tbody></table>
+<h3>Row 4 — Result types</h3>
+<p>Checkboxes to restrict results to one or more object types. <strong>All</strong> selects every type; <strong>None</strong> clears all.</p>
+<table>
+<thead>
+<tr>
+<th>Checkbox</th>
+<th><code>type_s</code> value</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>AOP</td>
+<td><code>aop</code></td>
+<td>Adverse Outcome Pathway</td>
+</tr>
+<tr>
+<td>KE</td>
+<td><code>key_event</code></td>
+<td>Key Event (includes MIEs and AOs)</td>
+</tr>
+<tr>
+<td>Chemical</td>
+<td><code>chemical</code></td>
+<td>Chemical entity</td>
+</tr>
+<tr>
+<td>Stressor</td>
+<td><code>stressor</code></td>
+<td>Stressor (physical or chemical agent)</td>
+</tr>
+<tr>
+<td>Assay</td>
+<td><code>assay</code></td>
+<td>Measurement methodology extracted from KE descriptions</td>
+</tr>
+<tr>
+<td>Bio process</td>
+<td><code>biological_process</code></td>
+<td>Biological process component</td>
+</tr>
+<tr>
+<td>Bio object</td>
+<td><code>biological_object</code></td>
+<td>Biological object component</td>
+</tr>
+<tr>
+<td>Bio action</td>
+<td><code>biological_action</code></td>
+<td>Biological action component</td>
+</tr>
+<tr>
+<td>Bio event</td>
+<td><code>bio_event_triple</code></td>
+<td>Biological event triple (object–process–action)</td>
+</tr>
+<tr>
+<td>Taxonomy</td>
+<td><code>taxonomy</code></td>
+<td>Taxonomic applicability entry</td>
+</tr>
+<tr>
+<td>KER</td>
+<td><code>key_event_relationship</code></td>
+<td>Key Event Relationship</td>
+</tr>
+</tbody></table>
+<hr>
+<h2>Graph Traversal Options</h2>
+<p>The <strong>Graph Traversal</strong> dropdown controls whether and how the query result set is expanded by walking the AOP network in Solr.</p>
+<table>
+<thead>
+<tr>
+<th>Option</th>
+<th>Direction</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>None</code></td>
+<td>—</td>
+<td>No traversal. Returns only the documents directly matching the query.</td>
+</tr>
+<tr>
+<td><code>Upstream 1–5</code></td>
+<td>Upstream</td>
+<td>Expands results up to N steps upstream (<code>upstream_ss</code> links).</td>
+</tr>
+<tr>
+<td><code>Upstream (ALL)</code></td>
+<td>Upstream</td>
+<td>Expands results to all upstream nodes (no depth limit).</td>
+</tr>
+<tr>
+<td><code>Downstream -1 to -5</code></td>
+<td>Downstream</td>
+<td>Expands results up to N steps downstream (<code>downstream_ss</code> links).</td>
+</tr>
+<tr>
+<td><code>Downstream (ALL)</code></td>
+<td>Downstream</td>
+<td>Expands results to all downstream nodes (no depth limit).</td>
+</tr>
+<tr>
+<td><code>AOP graph</code></td>
+<td>Both</td>
+<td>Returns all KEs, MIEs, AOs, and stressors linked to matching AOPs via a multi-directional join. Useful for retrieving the full content of one or more AOPs.</td>
+</tr>
+<tr>
+<td><code>AOP extended</code></td>
+<td>Both</td>
+<td>As <code>AOP graph</code> plus a depth-1 graph traversal, adding bio event triples, assays, and chemicals associated with those KEs.</td>
+</tr>
+<tr>
+<td><code>MIE by AOP</code></td>
+<td>—</td>
+<td>Returns the MIEs of matching AOPs.</td>
+</tr>
+<tr>
+<td><code>AO by AOP</code></td>
+<td>—</td>
+<td>Returns the Adverse Outcomes of matching AOPs.</td>
+</tr>
+<tr>
+<td><code>KE by AOP</code></td>
+<td>—</td>
+<td>Returns all Key Events of matching AOPs.</td>
+</tr>
+<tr>
+<td><code>Stressors by AOP</code></td>
+<td>—</td>
+<td>Returns the stressors of matching AOPs.</td>
+</tr>
+<tr>
+<td><code>Similarity</code></td>
+<td>—</td>
+<td>Returns the 10 most chemically similar documents to the query compound using a molecular fingerprint vector index. Requires the query to resolve to a compound with a stored fingerprint.</td>
+</tr>
+</tbody></table>
+<p><strong>Tip:</strong> Combine <code>ID = AOP144</code> with <code>Graph = AOP graph</code> to retrieve the complete pathway for AOP144. Add <code>Graph = AOP extended</code> to also see its associated assays and chemicals.</p>
+<hr>
+<h2>Results Tab</h2>
+<p>The default tab shows a paginated results table.</p>
+<ul>
+<li><strong>ID column</strong> — links directly to the corresponding AOP-Wiki page for AOPs, KEs, KERs, and stressors.</li>
+<li><strong>Copy icon</strong> (📋) — copies the identifier into the <strong>ID</strong> field for a follow-up search.</li>
+<li><strong>Columns</strong> — table columns are auto-hidden when empty. Use the <strong>Columns</strong> button to toggle visibility.</li>
+<li><strong>Sort</strong> — click any column header to sort; click again to reverse.</li>
+<li><strong>Pagination</strong> — select 10, 25, or 50 rows per page.</li>
+<li><strong>Row click</strong> — opens the <strong>Detail Panel</strong> on the right (see below).</li>
+</ul>
+<h3>Facet Sidebar</h3>
+<p>When results contain mixed object types, a facet sidebar appears on the left showing the count for each <code>type_s</code>. Click a type to toggle it in the active type filter. This is equivalent to checking/unchecking the corresponding <strong>Result type</strong> checkbox.</p>
+<h3>Detail Panel</h3>
+<p>Clicking a result row opens a detail panel showing all available metadata for that object:</p>
+<ul>
+<li>Title, short name, description</li>
+<li>Biological organisation level, organ, cell type</li>
+<li>Upstream and downstream linked IDs — each with a 🔍 button to re-run the search for that ID</li>
+<li>MIEs and Adverse Outcomes (for AOPs)</li>
+<li>Associated assays</li>
+<li>Chemical name and CAS RN (for chemicals)</li>
+<li>DOI references as clickable <code>https://doi.org/…</code> links</li>
+<li>OECD status and project</li>
+<li>Point of contact</li>
+</ul>
+<hr>
+<h2>View &amp; Download Tab (Network Graph)</h2>
+<p>Switching to this tab renders a force-directed network graph of the current results using <a href="https://visjs.github.io/vis-network/docs/network/">vis-network</a>.</p>
+<h3>Node colours by type</h3>
+<table>
+<thead>
+<tr>
+<th>Colour</th>
+<th>Type</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Blue</td>
+<td>AOP</td>
+</tr>
+<tr>
+<td>Amber</td>
+<td>KE (intermediate)</td>
+</tr>
+<tr>
+<td>Cyan</td>
+<td>KE root (no upstream KE — likely MIE in context)</td>
+</tr>
+<tr>
+<td>Orange</td>
+<td>KE leaf (no downstream KE — likely AO in context)</td>
+</tr>
+<tr>
+<td>Green</td>
+<td>Stressor</td>
+</tr>
+<tr>
+<td>Pink</td>
+<td>Chemical</td>
+</tr>
+<tr>
+<td>Purple</td>
+<td>Assay</td>
+</tr>
+<tr>
+<td>Slate</td>
+<td>Bio event triple</td>
+</tr>
+</tbody></table>
+<h3>Interactions</h3>
+<ul>
+<li><strong>Hover</strong> over a node to see a tooltip with its title.</li>
+<li><strong>Click</strong> a node to open the Detail Panel.</li>
+<li><strong>Scroll</strong> to zoom; <strong>drag the background</strong> to pan.</li>
+<li><strong>Force-directed / Hierarchical</strong> toggle — switches between physics-based layout and a top-down hierarchy.</li>
+<li><strong>Physics</strong> toggle — enables or disables the physics simulation (auto-disabled above 500 nodes).</li>
+</ul>
+<h3>Download</h3>
+<p>The <strong>Download CSV</strong> button exports all result documents as a CSV file. Multi-value fields are joined with <code>|</code>. The graph is capped at <strong>500 nodes</strong> for rendering performance; the CSV always contains all results regardless of this cap.</p>
+<hr>
+<h2>Example Queries Tab</h2>
+<p>Click any tag to load a pre-built example into the search form. Then click <strong>AOP Wiki Search</strong> to run it. Examples cover common use cases including AOP graph retrieval, nanotoxicology stressor queries, assay-to-pathway mapping, OECD status filtering, and literature DOI searches.</p>
+<hr>
+<h2>Debug Info Tab</h2>
+<p>Shows the exact Solr query string sent for the last search, including the full <code>q</code> parameter after graph traversal expansion. Also includes a generated <strong>Python</strong> code snippet using <code>requests</code> that you can copy and run to reproduce the query programmatically.</p>
+<hr>
+<h2>URL Parameters</h2>
+<p>Every search is fully encoded in the browser URL. You can share or bookmark any query. Loading a URL with parameters automatically executes the search — no need to click Search manually.</p>
+<table>
+<thead>
+<tr>
+<th>Parameter</th>
+<th>Description</th>
+<th>Example</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>q</code></td>
+<td>Free text query</td>
+<td><code>q=oxidative+stress</code></td>
+</tr>
+<tr>
+<td><code>fieldId</code></td>
+<td>AOP-Wiki identifier</td>
+<td><code>fieldId=AOP144</code></td>
+</tr>
+<tr>
+<td><code>graph</code></td>
+<td>Graph traversal option</td>
+<td><code>graph=AOP</code></td>
+</tr>
+<tr>
+<td><code>types</code></td>
+<td>Comma-separated result types</td>
+<td><code>types=aop,key_event</code></td>
+</tr>
+<tr>
+<td><code>filters</code></td>
+<td>URL-encoded JSON of filter field values</td>
+<td>(set automatically by the form)</td>
+</tr>
+</tbody></table>
+<p><strong>Example:</strong> <a href="https://aop.adma.ai/?fieldId=AOP144&graph=AOP"><code>https://aop.adma.ai/?fieldId=AOP144&amp;graph=AOP</code></a> — loads and immediately runs the AOP graph for AOP144.</p>
+<hr>
+<h2>Frequently Used Queries</h2>
+<table>
+<thead>
+<tr>
+<th>Goal</th>
+<th>How</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Full pathway for a known AOP</td>
+<td>ID = <code>AOP144</code>, Graph = <code>AOP graph</code>, types = AOP + KE</td>
+</tr>
+<tr>
+<td>All KEs for a nano stressor</td>
+<td>Free text = <code>nano*</code>, Graph = <code>Downstream (ALL)</code>, types = KE + Stressor</td>
+</tr>
+<tr>
+<td>Which AOPs use a specific assay</td>
+<td>Measurement Methodology = <code>DAPI</code>, Graph = <code>Upstream (ALL)</code>, types = KE + AOP</td>
+</tr>
+<tr>
+<td>AOPs endorsed by OECD</td>
+<td>Free text = <code>oecd_status_t:(WPHA/WNT Endorsed)</code>, types = AOP</td>
+</tr>
+<tr>
+<td>AOPs citing a specific paper</td>
+<td>DOI = <code>10.3389/ftox.2021.653386</code></td>
+</tr>
+<tr>
+<td>Full extended view of one AOP</td>
+<td>ID = <code>AOP451</code>, Graph = <code>AOP extended</code>, all types selected</td>
+</tr>
+<tr>
+<td>AOPs applicable to human</td>
+<td>Applicability taxonomy = <code>human</code>, types = AOP</td>
+</tr>
+<tr>
+<td>Find AOPs by adverse outcome</td>
+<td>Adverse Outcomes = type or select a KE title, Graph = <code>AOP graph</code></td>
+</tr>
+</tbody></table>
+<hr>
+<h2>About</h2>
+<p>AOP Mapper is funded by the European Union&#39;s Horizon 2020 programme under grants <a href="https://www.harmless-project.eu/">953183 HARMLESS</a> and <a href="https://polyrisk.science/">964766 POLYRISK</a>.</p>
+<p>For questions or feedback: <a href="mailto:support@ideaconsult.net">support@ideaconsult.net</a> or use the <strong>💬</strong> feedback link in the search form.</p>
+
+    <hr class="mt-5" />
+    <p class="text-muted small">
+      AOP Mapper is funded by the European Union's Horizon 2020 under
+      <a href="https://www.harmless-project.eu/" target="_blank" rel="noreferrer">953183 HARMLESS</a>
+      and
+      <a href="https://polyrisk.science/" target="_blank" rel="noreferrer">964766 POLYRISK</a>.
+    </p>
+  </div>
+</body>
+</html>

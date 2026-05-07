@@ -186,6 +186,32 @@ export async function fetchVectorById(docId, vectorEmbedding = 'spectrum_p2048')
   }
 }
 
+/**
+ * Fetch the AOP-Wiki knowledge base version from the Solr index.
+ * Returns a formatted string like "2026-04-01", parsed from the id
+ * field of the version document (e.g. "KB_20260401").
+ * Returns null if the document is not found or cannot be parsed.
+ */
+export async function fetchAopWikiVersion() {
+  try {
+    const url = new URL(SOLR_URL);
+    url.searchParams.set('q', '*:*');
+    url.searchParams.set('fq', 'type_s:version');
+    url.searchParams.set('fl', 'id');
+    url.searchParams.set('rows', 1);
+    url.searchParams.set('wt', 'json');
+    const data = await solrFetch(url.toString());
+    const id = data?.response?.docs?.[0]?.id || '';
+    // Parse KB_YYYYMMDD → YYYY-MM-DD
+    const m = id.match(/^KB_(\d{4})(\d{2})(\d{2})$/);
+    if (m) return `${m[1]}-${m[2]}-${m[3]}`;
+    // Fallback: return the raw id minus the KB_ prefix
+    return id.replace(/^KB_/, '') || null;
+  } catch {
+    return null;
+  }
+}
+
 /** Facet-based autocomplete suggestions */
 export async function fetchFacetSuggestions(facetField, prefix) {
   const url = new URL(SOLR_URL);
