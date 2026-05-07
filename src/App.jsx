@@ -9,7 +9,7 @@ import DebugPanel from './components/DebugPanel.jsx';
 import FacetSidebar from './components/FacetSidebar.jsx';
 import DetailPanel from './components/DetailPanel.jsx';
 
-import { GRAPH_NODE_CAP } from './utils/solr.js';
+import { GRAPH_NODE_CAP, fetchAopWikiVersion } from './utils/solr.js';
 
 const TABS = [
   { key: 'results',  label: 'Results' },
@@ -35,6 +35,12 @@ function AopMapper() {
   const [sortField, setSortField]     = useState('title_t');
   const [sortDir, setSortDir]         = useState('asc');
   const [selectedDoc, setSelectedDoc] = useState(null);
+  const [aopWikiVersion, setAopWikiVersion] = useState(null);
+
+  // Fetch AOP-Wiki knowledge base version once on mount
+  useEffect(() => {
+    fetchAopWikiVersion().then(v => setAopWikiVersion(v));
+  }, []);
 
   // Fetch page whenever params or pagination/sort changes
   useEffect(() => {
@@ -235,6 +241,23 @@ function AopMapper() {
               <li><strong>View &amp; Download</strong> – network graph (force-directed or hierarchical) + CSV export. Capped at {GRAPH_NODE_CAP} nodes in the graph.</li>
               <li><strong>URL</strong> – search state is encoded in the URL; bookmark or share any query.</li>
             </ul>
+            {aopWikiVersion && (
+              <>
+                <hr />
+                <p className="small text-muted mb-0">
+                  <i className="fa fa-database me-1" />
+                  AOP-Wiki knowledge base:{' '}
+                  <a
+                    href="https://aopwiki.org/downloads"
+                    target="_blank"
+                    rel="noreferrer"
+                    className="text-muted"
+                  >
+                    {aopWikiVersion}
+                  </a>
+                </p>
+              </>
+            )}
           </div>
         </div>
       </div>
@@ -248,6 +271,20 @@ function AopMapper() {
             {' '}and{' '}
             <a href="https://polyrisk.science/" target="_blank" rel="noreferrer">964766 POLYRISK</a>
           </small>
+          {aopWikiVersion && (
+            <small className="text-muted">
+              <i className="fa fa-database me-1" />
+              AOP-Wiki:{' '}
+              <a
+                href="https://aopwiki.org/downloads"
+                target="_blank"
+                rel="noreferrer"
+                className="text-muted"
+              >
+                {aopWikiVersion}
+              </a>
+            </small>
+          )}
           <small>
             <a href="mailto:support@ideaconsult.net">support@ideaconsult.net</a>
           </small>
