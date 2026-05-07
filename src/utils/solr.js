@@ -51,6 +51,22 @@ async function solrFetch(url, options = {}) {
   }
 }
 
+/**
+ * Escape a filter value for use in a Solr query clause.
+ * Values that contain special characters (/, :, ., -, spaces, brackets, etc.)
+ * must be quoted with double quotes so Solr treats them as literal strings.
+ * Already-quoted values are passed through unchanged.
+ * Simple alphanumeric tokens (e.g. plain IDs like KE1234) are left unquoted.
+ */
+function solrQuote(value) {
+  // Already quoted — leave as-is
+  if (value.startsWith('"') && value.endsWith('"')) return value;
+  // Pure alphanumeric + underscore — safe without quotes (e.g. KE1234, aop)
+  if (/^[A-Za-z0-9_]+$/.test(value)) return value;
+  // Everything else: wrap in double quotes, escaping any internal double quotes
+  return `"${value.replace(/\\/g, '\\\\').replace(/"/g, '\\"')}"`;
+}
+
 /** Build URLSearchParams from search state. Async because similarity needs a vector fetch. */
 export async function buildSolrParams(state) {
   const { q = '', fieldId = '', graph = '0', types = [], filters = {} } = state;
@@ -74,7 +90,7 @@ export async function buildSolrParams(state) {
     if (val) {
       const parts = val.split('|');
       const code = parts[parts.length - 1].trim();
-      clauses.push(`${field}:${code}`);
+      clauses.push(`${field}:${solrQuote(code)}`);
     }
   }
 
