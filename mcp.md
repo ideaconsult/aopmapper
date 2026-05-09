@@ -29,10 +29,10 @@ MCP is an open standard that allows AI assistants to call external tools during 
 ### Claude.ai (web)
 
 1. Open [claude.ai](https://claude.ai) and sign in
-2. Go to **Settings → Integrations**
-3. Click **Add integration**
-4. Enter the MCP URL: `https://mcp.aop.adma.ai/mcp`
-5. Save — the AOP tools are now available in all conversations
+2. Go to **Settings → Connectors**
+3. Click **Add custom connector**
+4. Enter name: AOPMapper, the Remote MCP Server URL: `https://mcp.aop.adma.ai/mcp`
+5. Save — the AOPMapper tools are now available in all conversations
 
 ### Claude Desktop
 
@@ -131,7 +131,7 @@ Get the full structure of one AOP — MIE, intermediate key events, adverse outc
 
 | Parameter | Type | Description |
 |---|---|---|
-| `aop_id` | string | AOP numeric ID, e.g. `173`, `AOP144` |
+| `aop_id` | string | AOP ID, e.g. `AOP173`, `AOP144` |
 
 **Example prompt:**
 > "Give me the full structure of AOP173 — what is the MIE, what are the key events in order, what is the adverse outcome, and what assays can measure each step?"
@@ -148,7 +148,7 @@ Get detailed information about a specific Key Event.
 
 | Parameter | Type | Description |
 |---|---|---|
-| `ke_id` | string | Key Event numeric ID, e.g. `1392`, `KE887` |
+| `ke_id` | string | Key Event ID, e.g. `KE1392`, `KE887` |
 
 **Example prompt:**
 > "What is KE1392? What does it connect to upstream and downstream, and how can it be measured?"
@@ -165,7 +165,7 @@ Get the details of a Key Event Relationship — which KE leads to which.
 
 | Parameter | Type | Description |
 |---|---|---|
-| `ke_id` | string | KER numeric ID, e.g. `1702`, `KER1702` |
+| `ke_id` | string | KER ID, e.g. `KER1702`, `KER1702` |
 
 **Example prompt:**
 > "Explain KER1702 — what is the upstream event, what is the downstream event, and what is the biological basis of the relationship?"
