@@ -37,23 +37,17 @@ function AopMapper() {
   const [selectedDoc, setSelectedDoc] = useState(null);
   const [aopWikiVersion, setAopWikiVersion] = useState(null);
 
-  // Fetch AOP-Wiki knowledge base version once on mount
   useEffect(() => {
     fetchAopWikiVersion().then(v => setAopWikiVersion(v));
   }, []);
 
-  // Fetch page whenever params or pagination/sort changes
   useEffect(() => {
     if (!solrParams) return;
     fetchPage(solrParams, page * pageSize, pageSize, sortField, sortDir);
   }, [solrParams, page, pageSize, sortField, sortDir, fetchPage]);
 
-  // Reset page when new search fires
-  useEffect(() => {
-    setPage(0);
-  }, [solrParams]);
+  useEffect(() => { setPage(0); }, [solrParams]);
 
-  // Fetch full docs when graph tab becomes active
   useEffect(() => {
     if (activeTab === 'network' && solrParams && fullDocs.length === 0) {
       fetchFull(solrParams);
@@ -70,9 +64,7 @@ function AopMapper() {
     setPage(0);
   }
 
-  function handleSetFieldId(id) {
-    updateForm({ fieldId: id });
-  }
+  function handleSetFieldId(id) { updateForm({ fieldId: id }); }
 
   function handleFacetToggle(type) {
     const types = formState.types;
@@ -80,11 +72,8 @@ function AopMapper() {
     updateForm({ types: next });
   }
 
-  function handleNodeClick(doc) {
-    setSelectedDoc(doc);
-  }
+  function handleNodeClick(doc) { setSelectedDoc(doc); }
 
-  // Search by ID from DetailPanel link
   function handleSearchId(id) {
     updateForm({ fieldId: id });
     search({ ...formState, fieldId: id });
@@ -114,11 +103,7 @@ function AopMapper() {
 
       {/* Search form */}
       <div className="container-fluid py-2">
-        <SearchForm
-          state={formState}
-          onChange={updateForm}
-          onSubmit={() => search()}
-        />
+        <SearchForm state={formState} onChange={updateForm} onSubmit={() => search()} />
       </div>
 
       {/* Tabs */}
@@ -154,7 +139,6 @@ function AopMapper() {
               </div>
             ) : (
               <div className="d-flex gap-3">
-                {/* Facet sidebar */}
                 {Object.keys(facets).length > 0 && (
                   <FacetSidebar
                     facets={facets}
@@ -162,30 +146,20 @@ function AopMapper() {
                     onToggle={handleFacetToggle}
                   />
                 )}
-
-                {/* Main table + detail panel */}
                 <div className="flex-grow-1 min-w-0">
-                  <div className={`d-flex gap-3 ${selectedDoc ? '' : ''}`}>
+                  <div className="d-flex gap-3">
                     <div className="flex-grow-1 min-w-0">
                       <ResultsTable
-                        rows={rows}
-                        total={total}
-                        loading={loading}
-                        error={error}
-                        page={page}
-                        setPage={setPage}
-                        pageSize={pageSize}
-                        setPageSize={setPageSize}
-                        sortField={sortField}
-                        sortDir={sortDir}
-                        onSort={handleSort}
+                        rows={rows} total={total} loading={loading} error={error}
+                        page={page} setPage={setPage}
+                        pageSize={pageSize} setPageSize={setPageSize}
+                        sortField={sortField} sortDir={sortDir} onSort={handleSort}
                         onSetFieldId={handleSetFieldId}
                         onRowClick={setSelectedDoc}
                         selectedId={selectedDoc?.id}
                         isSorted={isSorted}
                       />
                     </div>
-
                     {selectedDoc && (
                       <div style={{ width: '380px', flexShrink: 0 }}>
                         <DetailPanel
@@ -204,9 +178,7 @@ function AopMapper() {
           {/* Network tab */}
           <div className={`tab-pane p-3 ${activeTab === 'network' ? 'show active' : ''}`}>
             <NetworkGraph
-              fullDocs={fullDocs}
-              loading={fullLoading}
-              error={fullError}
+              fullDocs={fullDocs} loading={fullLoading} error={fullError}
               onNodeClick={handleNodeClick}
             />
           </div>
@@ -228,6 +200,10 @@ function AopMapper() {
               <a href="./help.html" target="_blank" rel="noreferrer">
                 <i className="fa fa-book me-1" />AOP Mapper User Guide
               </a>
+              <span className="mx-2 text-muted">·</span>
+              <a href="./mcp.html" target="_blank" rel="noreferrer">
+                <i className="fa fa-robot me-1" />MCP / AI Assistants
+              </a>
             </p>
             <hr />
             <h3 className="h6">Quick reference</h3>
@@ -238,21 +214,26 @@ function AopMapper() {
               <li><strong>Result types</strong> – filter to AOP, KE, Chemical, Stressor, Assay, Bio process/object/action, Bio event, Taxonomy, KER.</li>
               <li><strong>Facet sidebar</strong> – click a type count to toggle that type filter.</li>
               <li><strong>Table rows</strong> – click a row to open the detail panel.</li>
-              <li><strong>View &amp; Download</strong> – network graph (force-directed or hierarchical) + CSV export. Capped at {GRAPH_NODE_CAP} nodes in the graph.</li>
-              <li><strong>URL</strong> – search state is encoded in the URL; bookmark or share any query.</li>
+              <li><strong>View &amp; Download</strong> – network graph + CSV export. Capped at {GRAPH_NODE_CAP} nodes.</li>
+              <li><strong>URL</strong> – search state is in the URL; bookmark or share any query.</li>
             </ul>
+            <hr />
+            <h3 className="h6">AI Assistants (MCP)</h3>
+            <p className="small">
+              Connect Claude, ChatGPT, or any MCP-compatible assistant to AOP-Wiki data.{' '}
+              <a href="./mcp.html" target="_blank" rel="noreferrer">Setup instructions →</a>
+            </p>
+            <p className="small mb-0">
+              <code>https://mcp.aop.adma.ai/mcp</code>
+            </p>
             {aopWikiVersion && (
               <>
                 <hr />
                 <p className="small text-muted mb-0">
                   <i className="fa fa-database me-1" />
                   AOP-Wiki knowledge base:{' '}
-                  <a
-                    href="https://aopwiki.org/downloads"
-                    target="_blank"
-                    rel="noreferrer"
-                    className="text-muted"
-                  >
+                  <a href="https://aopwiki.org/downloads" target="_blank"
+                     rel="noreferrer" className="text-muted">
                     {aopWikiVersion}
                   </a>
                 </p>
@@ -275,12 +256,8 @@ function AopMapper() {
             <small className="text-muted">
               <i className="fa fa-database me-1" />
               AOP-Wiki:{' '}
-              <a
-                href="https://aopwiki.org/downloads"
-                target="_blank"
-                rel="noreferrer"
-                className="text-muted"
-              >
+              <a href="https://aopwiki.org/downloads" target="_blank"
+                 rel="noreferrer" className="text-muted">
                 {aopWikiVersion}
               </a>
             </small>
