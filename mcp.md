@@ -58,7 +58,7 @@ Restart Claude Desktop after saving.
 
 ## Connecting to ChatGPT
 
-Connecting to a custom MCP server in ChatGPT requires **Developer Mode**, available on **Plus, Pro, Team, Business, Enterprise, and Edu** plans (not available on the free plan).
+Connecting to a custom MCP server in ChatGPT requires **Developer Mode**.
 
 > **Note:** As of December 2025, ChatGPT renamed "Connectors" to **Apps**. The steps below use the current terminology.
 
