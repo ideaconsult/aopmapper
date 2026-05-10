@@ -16,8 +16,8 @@ const EXAMPLES = {
     graph: '-1',
     types: ['key_event', 'aop', 'bio_event_triple'],
     filters: {
-      biological_process_ids_ss: 'BP46844',
-      biological_action_ids_ss: 'BA1',
+      biological_process_ids_ss: 'MP_0003674',
+      biological_action_ids_ss: 'increased',
     },
   },
   'aop144': {
