@@ -21,6 +21,53 @@ const LAYOUTS = [
   { key: 'hierarchical', label: 'Hierarchical' },
 ];
 
+
+function getNodeShape(type) {
+  switch (type) {
+    case 'bio_event_triple':
+      return {
+        shape: 'box',
+        margin: 10,
+        shapeProperties: {
+          borderRadius: 20,
+        },
+      };
+
+    case 'key_event':
+      return {
+        shape: 'ellipse',
+      };
+
+    case 'chemical':
+      return {
+        shape: 'diamond',
+      };
+
+    case 'aop':
+      return {
+        shape: 'box',
+        margin: 5,
+        shapeProperties: {
+          borderRadius: 10,
+        },
+      };
+
+    case 'assay':
+      return {
+        shape: 'box',
+        margin: 5,
+        shapeProperties: {
+          borderRadius: 2,
+        },
+      };
+
+    default:
+      return {
+        shape: 'ellipse',
+      };
+  }
+}
+
 function buildGraphData(docs) {
   const nodes = [], edges = [];
   const seenNodes = new Set(), validIds = new Set();
@@ -35,6 +82,7 @@ function buildGraphData(docs) {
       group: doc.type_s || 'default',
       title: tooltip ? `${doc.id}. ${tooltip}` : doc.id,
       color: GROUP_COLORS[doc.type_s] || GROUP_COLORS.default,
+      ... getNodeShape(doc.type_s),
       _doc: doc,
     });
     seenNodes.add(doc.id);
