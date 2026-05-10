@@ -4,7 +4,7 @@ export const FL =
   'score,id,title_t,name_t,short_name_t,description_t,type_s,' +
   'point_of_contact_t,oecd_project_t,oecd_status_t,source_t,' +
   'doi_ss,upstream_ss,downstream_ss,molecular_initiating_event_ss,' +
-  'adverse_outcome_ss,attr_biological_events,attr_organ_term,' +
+  'adverse_outcome_ss,MIE_ss,attr_biological_events,attr_organ_term,' +
   'attr_cell_term,biological_object_ids_ss,biological_process_ids_ss,' +
   'biological_action_ids_ss,biological_triple_ids_ss,biological_triple_size_d,' +
   'biological_organization_level_t,attr_assays,casrn_s,' +
@@ -19,7 +19,6 @@ async function solrFetch(url, options = {}) {
   const timeoutController = new AbortController();
   const timeoutId = setTimeout(() => timeoutController.abort(), TIMEOUT_MS);
 
-  // AbortSignal.any() is available in all modern browsers
   const signal = callerSignal
     ? AbortSignal.any([callerSignal, timeoutController.signal])
     : timeoutController.signal;
@@ -39,7 +38,6 @@ async function solrFetch(url, options = {}) {
 
     const data = await res.json();
 
-    // Solr returns 200 with an error key on bad queries
     if (data?.error) {
       throw new Error(data.error.msg || JSON.stringify(data.error));
     }
@@ -51,29 +49,18 @@ async function solrFetch(url, options = {}) {
   }
 }
 
-/**
- * Escape a filter value for use in a Solr query clause.
- * Values that contain special characters (/, :, ., -, spaces, brackets, etc.)
- * must be quoted with double quotes so Solr treats them as literal strings.
- * Already-quoted values are passed through unchanged.
- * Simple alphanumeric tokens (e.g. plain IDs like KE1234) are left unquoted.
- */
 function solrQuote(value) {
-  // Already quoted — leave as-is
   if (value.startsWith('"') && value.endsWith('"')) return value;
-  // Pure alphanumeric + underscore — safe without quotes (e.g. KE1234, aop)
   if (/^[A-Za-z0-9_]+$/.test(value)) return value;
-  // Everything else: wrap in double quotes, escaping any internal double quotes
   return `"${value.replace(/\\/g, '\\\\').replace(/"/g, '\\"')}"`;
 }
 
-/** Build URLSearchParams from search state. Async because similarity needs a vector fetch. */
+/** Build URLSearchParams from search state. */
 export async function buildSolrParams(state) {
   const { q = '', fieldId = '', graph = '0', types = [], filters = {} } = state;
 
   let qValue = q.trim() || '*:*';
 
-  // Additional field clauses
   const clauses = [];
   if (fieldId.trim()) clauses.push(`id:${fieldId.trim()}`);
 
@@ -99,7 +86,6 @@ export async function buildSolrParams(state) {
     qValue = qValue === '*:*' ? extra : `(${qValue}) AND ${extra}`;
   }
 
-  // Graph expansion
   if (graph === 'similarity') {
     const vector = await fetchVectorById(qValue);
     if (vector) {
@@ -134,7 +120,6 @@ export async function buildSolrParams(state) {
   if (types.length > 0) params.append('fq', `type_s:(${types.join(' OR ')})`);
   params.append('wt', 'json');
   params.append('fl', FL);
-  // Request type_s facets on every query
   params.append('facet', 'true');
   params.append('facet.field', 'type_s');
   params.append('facet.mincount', '1');
@@ -142,7 +127,7 @@ export async function buildSolrParams(state) {
   return params;
 }
 
-/** Fetch one result page. Signal is optional (AbortController). */
+/** Fetch one result page. */
 export async function fetchSolrPage(params, start, rows, sortField, sortDir, signal) {
   const p = new URLSearchParams(params);
   p.set('start', start);
@@ -156,7 +141,6 @@ export async function fetchSolrPage(params, start, rows, sortField, sortDir, sig
   });
 }
 
-/** Max nodes to render in the graph. Above this show a warning + truncate. */
 export const GRAPH_NODE_CAP = 500;
 
 /** Fetch all docs for graph/download. */
@@ -171,7 +155,6 @@ export async function fetchAllResults(params, signal) {
   return data?.response?.docs || [];
 }
 
-/** Fetch embedding vector for similarity search */
 export async function fetchVectorById(docId, vectorEmbedding = 'spectrum_p2048') {
   try {
     const url = new URL(SOLR_URL);
@@ -186,12 +169,6 @@ export async function fetchVectorById(docId, vectorEmbedding = 'spectrum_p2048')
   }
 }
 
-/**
- * Fetch the AOP-Wiki knowledge base version from the Solr index.
- * Returns a formatted string like "2026-04-01", parsed from the id
- * field of the version document (e.g. "KB_20260401").
- * Returns null if the document is not found or cannot be parsed.
- */
 export async function fetchAopWikiVersion() {
   try {
     const url = new URL(SOLR_URL);
@@ -202,17 +179,14 @@ export async function fetchAopWikiVersion() {
     url.searchParams.set('wt', 'json');
     const data = await solrFetch(url.toString());
     const id = data?.response?.docs?.[0]?.id || '';
-    // Parse KB_YYYYMMDD → YYYY-MM-DD
     const m = id.match(/^KB_(\d{4})(\d{2})(\d{2})$/);
     if (m) return `${m[1]}-${m[2]}-${m[3]}`;
-    // Fallback: return the raw id minus the KB_ prefix
     return id.replace(/^KB_/, '') || null;
   } catch {
     return null;
   }
 }
 
-/** Facet-based autocomplete suggestions */
 export async function fetchFacetSuggestions(facetField, prefix) {
   const url = new URL(SOLR_URL);
   url.searchParams.set('q', '*:*');
@@ -231,7 +205,6 @@ export async function fetchFacetSuggestions(facetField, prefix) {
   } catch { return []; }
 }
 
-/** Doc-based autocomplete suggestions */
 export async function fetchDocSuggestions(labelField, codeField, fq, query) {
   const url = new URL(SOLR_URL);
   url.searchParams.set('q', `${query}*`);
@@ -254,10 +227,8 @@ export async function fetchDocSuggestions(labelField, codeField, fq, query) {
   } catch { return []; }
 }
 
-/** Generate Python snippet */
 export function generatePythonCode(paramsString) {
   const obj = Object.fromEntries(new URLSearchParams(paramsString));
-  // Strip internal facet params
   ['facet', 'facet.field', 'facet.mincount'].forEach(k => delete obj[k]);
   const lines = Object.entries(obj).map(
     ([k, v]) => `    '${k}': '${v.replace(/\\/g, '\\\\').replace(/'/g, "\\'")}',`
@@ -274,7 +245,6 @@ data = response.json()
 print(json.dumps(data, indent=2))`;
 }
 
-/** Build a CSV blob URL from a docs array */
 export function buildCsvUrl(docs) {
   if (!docs?.length) return null;
   const keys = [...new Set(docs.flatMap(d => Object.keys(d)))];
