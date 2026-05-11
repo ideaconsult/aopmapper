@@ -220,7 +220,7 @@ function AopMapper() {
             <hr />
             <h3 className="h6">AI Assistants (MCP)</h3>
             <p className="small">
-              Connect Claude, ChatGPT, or any MCP-compatible assistant to AOP-Wiki data.{' '}
+              Connect Mistral's Le Chat, Claude, ChatGPT, or any MCP-compatible assistant to AOP-Wiki data.{' '}
               <a href="./mcp.html" target="_blank" rel="noreferrer">Setup instructions →</a>
             </p>
             <p className="small mb-0">
