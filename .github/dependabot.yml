@@ -16,6 +16,8 @@ updates:
     assignees:
       - "kerberizer"
     ignore:
+      - dependency-name: "node"
+        versions: [">= 25.0.0"]
       - dependency-name: "react"
         versions: [">= 19.0.0"]
       - dependency-name: "react-dom"
