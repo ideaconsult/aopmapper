@@ -158,12 +158,34 @@
   <div class="container-fluid px-3">
     <div class="help-card">
       <h1>AOP Mapper MCP</h1>
-<p>The AOP Mapper exposes an <a href="https://modelcontextprotocol.io">MCP (Model Context Protocol)</a> server that lets AI assistants — Claude, ChatGPT, and any other MCP-compatible client — query AOP-Wiki data directly during a conversation.</p>
+<p>The AOP Mapper exposes an <a href="https://modelcontextprotocol.io">MCP (Model Context Protocol)</a> server that lets AI assistants — Mistral&#39;s Le Chat, Claude, ChatGPT, and any other MCP-compatible client — query AOP-Wiki data directly during a conversation.</p>
 <p><strong>MCP endpoint:</strong> <code>https://mcp.aop.adma.ai/mcp</code></p>
 <hr>
 <h2>What is MCP?</h2>
 <p>MCP is an open standard that allows AI assistants to call external tools during a conversation. Instead of relying on the model&#39;s training data, the assistant queries live, structured knowledge and incorporates the results into its answer. For AOP-Wiki this means the assistant can retrieve current pathway data, key event details, and assay information without hallucinating IDs or structures.</p>
 <hr>
+<h2>Connecting to Mistral&#39;s Le Chat</h2>
+<h3>Configuration</h3>
+<ol>
+<li>Open <a href="https://chat.mistral.ai/">Mistral&#39;s Le Chat</a> and sign in</li>
+<li>From the left panel, select <strong>Intelligence</strong> (the four-pointed star if the panel is closed)</li>
+<li>Select <strong>Connectors</strong> from the <em>Intelligence</em> options</li>
+<li>From the main panel, choose <strong>+ Add Connector</strong></li>
+<li>Switch to <strong>Custom MCP Connector</strong> in the modal window</li>
+<li>Enter <code>AOPMapper</code> for <strong>Connector Title</strong></li>
+<li>Enter <code>https://mcp.aop.adma.ai/mcp</code> for <strong>Connector Server</strong></li>
+<li>Leave <code>No Authentication</code> selected for <strong>Authentication Method</strong></li>
+<li>Double-check steps 6-8 and click <strong>Connect</strong></li>
+</ol>
+<h3>Chat use</h3>
+<ol>
+<li>Open a new chat</li>
+<li>Click the <code>+</code> button below the chat.</li>
+<li>Select <strong>Connectors</strong></li>
+<li>Select <code>AOPMapper</code> from the list (if necessary, search for it).</li>
+<li>When activated properly, an intersecting circles button will appear below the chat.</li>
+<li>Ask your question. If Le Chat used the tool, there will be an expandable box above the reply.</li>
+</ol>
 <h2>Connecting to Claude</h2>
 <h3>Claude.ai (web)</h3>
 <ol>

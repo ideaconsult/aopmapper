@@ -12,7 +12,7 @@ logoHref: "/aop"
 
 # AOP Mapper MCP
 
-The AOP Mapper exposes an [MCP (Model Context Protocol)](https://modelcontextprotocol.io) server that lets AI assistants — Claude, ChatGPT, and any other MCP-compatible client — query AOP-Wiki data directly during a conversation.
+The AOP Mapper exposes an [MCP (Model Context Protocol)](https://modelcontextprotocol.io) server that lets AI assistants — Mistral's Le Chat, Claude, ChatGPT, and any other MCP-compatible client — query AOP-Wiki data directly during a conversation.
 
 **MCP endpoint:** `https://mcp.aop.adma.ai/mcp`
 
@@ -23,6 +23,29 @@ The AOP Mapper exposes an [MCP (Model Context Protocol)](https://modelcontextpro
 MCP is an open standard that allows AI assistants to call external tools during a conversation. Instead of relying on the model's training data, the assistant queries live, structured knowledge and incorporates the results into its answer. For AOP-Wiki this means the assistant can retrieve current pathway data, key event details, and assay information without hallucinating IDs or structures.
 
 ---
+
+## Connecting to Mistral's Le Chat
+
+### Configuration
+
+1. Open [Mistral's Le Chat](https://chat.mistral.ai/) and sign in
+2. From the left panel, select **Intelligence** (the four-pointed star if the panel is closed)
+3. Select **Connectors** from the *Intelligence* options
+4. From the main panel, choose **+ Add Connector**
+5. Switch to **Custom MCP Connector** in the modal window
+6. Enter `AOPMapper` for **Connector Title**
+7. Enter `https://mcp.aop.adma.ai/mcp` for **Connector Server**
+8. Leave `No Authentication` selected for **Authentication Method**
+9. Double-check steps 6-8 and click **Connect**
+
+### Chat use
+
+1. Open a new chat
+2. Click the `+` button below the chat.
+3. Select **Connectors**
+4. Select `AOPMapper` from the list (if necessary, search for it).
+5. When activated properly, an intersecting circles button will appear below the chat.
+6. Ask your question. If Le Chat used the tool, there will be an expandable box above the reply.
 
 ## Connecting to Claude
 
