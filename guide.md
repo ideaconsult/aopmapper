@@ -215,6 +215,6 @@ Every search is fully encoded in the browser URL. You can share or bookmark any 
 
 ## About
 
-AOP Mapper is funded by the European Union's Horizon 2020 programme under grants [953183 HARMLESS](https://www.harmless-project.eu/) and [964766 POLYRISK](https://polyrisk.science/).
+AOP Mapper is funded by the European Union's H2020 programme under grants [953183 HARMLESS](https://www.harmless-project.eu/) and [964766 POLYRISK](https://polyrisk.science/) & Horizon Europe [101130073 PHANTASTIC](https://phantastic-project.eu/)
 
 For questions or feedback: [support@ideaconsult.net](mailto:support@ideaconsult.net) or use the **💬** feedback link in the search form.

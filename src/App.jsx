@@ -247,10 +247,12 @@ function AopMapper() {
       <footer className="aop-footer mt-3">
         <div className="container-fluid d-flex flex-wrap justify-content-between gap-2">
           <small>
-            Funded by the European Union's Horizon 2020 under{' '}
+            Funded by the European Union's H2020 under{' '}
             <a href="https://www.harmless-project.eu/" target="_blank" rel="noreferrer">953183 HARMLESS</a>
-            {' '}and{' '}
+            {' '} and {' '}
             <a href="https://polyrisk.science/" target="_blank" rel="noreferrer">964766 POLYRISK</a>
+            {' '} and {' Horizon Europe '}
+            <a href="https://phantastic-project.eu/" target="_blank" rel="noreferrer">101130073 PHANTASTIC</a>
           </small>
           {aopWikiVersion && (
             <small className="text-muted">

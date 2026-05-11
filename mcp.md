@@ -247,6 +247,7 @@ Source: [AOP-Wiki](https://aopwiki.org) · [AOP-Wiki downloads](https://aopwiki.
 
 ## About
 
-AOP Mapper MCP is funded by the European Union's Horizon 2020 programme under grants [953183 HARMLESS](https://www.harmless-project.eu/) and [964766 POLYRISK](https://polyrisk.science/).
+AOP Mapper MCP is funded by the European Union's H2020 programme under grants [953183 HARMLESS](https://www.harmless-project.eu/) and [964766 POLYRISK](https://polyrisk.science/) & Horizon Europe [101130073 PHANTASTIC](https://phantastic-project.eu/)
+.
 
 For questions or feedback: [support@ideaconsult.net](mailto:support@ideaconsult.net) or use the **💬** feedback link in the [AOP Mapper UI](https://aop.adma.ai).
