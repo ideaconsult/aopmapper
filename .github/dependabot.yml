@@ -33,3 +33,6 @@ updates:
       interval: "weekly"
     assignees:
       - "kerberizer"
+    ignore:
+      - dependency-name: "node"
+        versions: [">= 25.0.0"]
