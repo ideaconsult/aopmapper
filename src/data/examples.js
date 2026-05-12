@@ -1,4 +1,110 @@
 const EXAMPLES = {
+  'KE177': {
+    label: 'KE177',
+    title: 'KE177',
+    q: '',
+    fieldId: 'KE177',
+    graph: '0',
+    types: ['aop', 'key_event'],
+    filters: {},
+  },
+  'KE177_neighbors_up': {
+    label: 'KE177 upstream neighbors',
+    title: 'KE177 upstream neighbors',
+    q: '',
+    fieldId: 'KE177',
+    graph: '1',
+    types: [],
+    filters: {},
+  },  
+  'KE177_neighbors_down': {
+    label: 'KE177 downstream neighbors',
+    title: 'KE177 downstream neighbors',
+    q: '',
+    fieldId: 'KE177',
+    graph: '-1',
+    types: [],
+    filters: {},
+  },   
+  'KE177_KE1115_KE1392': {
+    label: 'KE177; KE1115; KE1392',
+    title: '3 keys by identifiers',
+    q: 'id:KE177 id:KE1115 id:KE1392',
+    fieldId: '',
+    graph: '0',
+    types: ['aop', 'key_event', 'key_event_relationship'],
+    filters: {},
+  },    
+  'doi_aop': {
+    label: 'AOP by DOI',
+    title: 'Find AOP by DOI',
+    q: '',
+    fieldId: '',
+    graph: '0',
+    types: [],
+    filters: {
+      doi_ss: '10.3389/ftox.2021.653386'
+    }
+  },
+  'doi_aopgraph': {
+    label: 'AOP graph by DOI',
+    title: 'Find AOP graph by DOI',
+    q: '',
+    fieldId: '',
+    graph: 'AOP',
+    types: [],
+    filters: {
+      doi_ss: '10.3389/ftox.2021.653386'
+    }
+  },  
+  'doi_aopgraph_assays': {
+    label: 'AOP graph & assays by DOI',
+    title: 'Find extended AOP graph by DOI (with e.g. assays)',
+    q: '',
+    fieldId: '',
+    graph: 'AOPextended',
+    types: [],
+    filters: {
+      doi_ss: '10.3389/ftox.2021.653386'
+    }
+  },    
+  'AOP173': {
+    label: 'AOP173',
+    title: 'AOP 173',
+    q: 'id:AOP173',
+    fieldId: '',
+    graph: 'AOP',
+    types: ['aop', 'key_event', 'stressor', 'chemical'],
+    filters: {},
+  },  
+  'adverse_outcomes': {
+    label: 'Adverse outcomes of AOP',
+    title: 'Adverse outcomes from AOP 173',
+    q: '{!join from=adverse_outcome_ss to=id}id:AOP173',
+    fieldId: '',
+    graph: '0',
+    types: [],
+    filters: {},
+  },
+ 
+   'nano': {
+    label: 'nano',
+    title: 'nano (anywhere)',
+    q: '"nano*"',
+    fieldId: '',
+    graph: '0',
+    types: [],
+    filters: {},
+  },
+  'KE-dapi': {
+    label: 'KE by DAPI',
+    title: 'Which Key Events are measured with DAPI assay?',
+    q: 'DAPI',
+    fieldId: '',
+    graph: '0',
+    types: ['key_event', 'assay', 'bio_event_triple'],
+    filters: {},
+  },  
   'liver-chem': {
     label: 'liver toxicity-related compounds',
     title: 'List all liver toxicity-related compounds in AopWiki',
@@ -65,6 +171,7 @@ const EXAMPLES = {
     types: ['key_event'],
     filters: {},
   },
+  
   'doi-aop173': {
     label: 'AOP173 references',
     title: 'What evidence, in the form of publication DOIs, underlies AOP 173?',
@@ -83,22 +190,13 @@ const EXAMPLES = {
     types: ['aop', 'chemical', 'stressor'],
     filters: {},
   },
-  'mie-dapi': {
-    label: 'MIE by DAPI',
-    title: 'Which MIEs are measured with DAPI assay?',
-    q: 'measurement_methodology_t:DAPI',
-    fieldId: '',
-    graph: '0',
-    types: ['key_event'],
-    filters: {},
-  },
   'aop-dapi': {
     label: 'KE/AOP DAPI assay',
     title: 'Which KEs are measured with DAPI assay, and with which AOPs are they connected?',
     q: 'measurement_methodology_t:DAPI',
     fieldId: '',
     graph: '999',
-    types: ['key_event', 'aop'],
+    types: ['key_event', 'aop', 'assay'],
     filters: {},
   },
   'neutrophils-dapi': {
@@ -137,24 +235,7 @@ const EXAMPLES = {
     types: [],
     filters: {},
   },
-  'adverse_outcomes': {
-    label: 'Adverse outcomes of AOP',
-    title: 'Adverse outcomes from AOP 173',
-    q: '{!join from=adverse_outcome_ss to=id}id:AOP173',
-    fieldId: '',
-    graph: '0',
-    types: [],
-    filters: {},
-  },
-  'AOP173': {
-    label: 'AOP173',
-    title: 'AOP 173',
-    q: 'id:AOP173',
-    fieldId: '',
-    graph: 'AOP',
-    types: ['aop', 'key_event', 'stressor', 'chemical'],
-    filters: {},
-  },
+
   'AOP451': {
     label: 'AOP451',
     title: 'AOP 451 with extended graph',
