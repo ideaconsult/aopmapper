@@ -98,7 +98,10 @@ function AopMapper() {
         </a>
         <h1 className="mb-0">AOP Mapper</h1>
         <span className="text-muted small ms-auto d-none d-md-inline">
-          Towards bridging eNanoMapper assays and AOP pathways
+          Towards bridging <a href="https://enanomapper.adma.ai" target="_blank"
+                     rel="noreferrer" className="text-muted">eNanoMapper</a> assays 
+                     and <a href="https://aopwiki.org/" target="_blank"
+                     rel="noreferrer" className="text-muted" >AOP</a> pathways
         </span>
       </header>
 
