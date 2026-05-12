@@ -17,6 +17,7 @@ const TABS = [
   { key: 'examples', label: 'Example Queries' },
   { key: 'debug',    label: 'Debug Info' },
   { key: 'help',     label: 'Help' },
+  { key: 'feedback',     label: 'Feedback' },
 ];
 
 function AopMapper() {
@@ -240,6 +241,52 @@ function AopMapper() {
               </>
             )}
           </div>
+
+          {/* Feedback tab */}
+        <div className={`tab-pane p-3 ${activeTab === 'feedback' ? 'show active' : ''}`}>
+          <h2 className="h5">Submit feedback</h2>
+
+
+          <p className="mb-2">
+            Help improve AOPMapper
+          </p>
+
+          <div className="mb-3">
+            <a
+              href="https://forms.gle/h6xwjhzeqshjh53p7"
+              target="_blank"
+              rel="noreferrer"
+            >
+              <i className="fa fa-comments me-1" />
+              Submit general feedback
+            </a>
+
+            <div className="small text-muted mt-1">
+              Report issues, suggest improvements, or share comments about the platform.
+            </div>
+          </div>
+
+          <p className="mb-2">
+            Help improve AI-assisted Key Event Component (KEC) annotation and curation
+          </p>          
+
+          <div>
+            <a
+              href="https://forms.gle/T4o3TRvSSLx5Q9zn8"
+              target="_blank"
+              rel="noreferrer"
+            >
+              <i className="fa fa-microscope me-1" />
+              Review AI-generated KEC annotations
+            </a>
+
+            <div className="small text-muted mt-1">
+              Review the predicted Key Event Component term, AI assessment,
+              proposed curation action, and supporting rationale.
+            </div>
+          </div>
+        </div>
+
         </div>
       </div>
 
