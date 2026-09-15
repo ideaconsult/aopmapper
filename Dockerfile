@@ -7,5 +7,5 @@ COPY . /app
 WORKDIR /app
 RUN CI=true pnpm install && pnpm build
 
-FROM nginx:1.31.3
+FROM nginx:1.31.5
 COPY --from=pnpm-stage /app/dist /usr/share/nginx/html
