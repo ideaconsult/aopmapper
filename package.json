@@ -5,7 +5,7 @@
   "dependencies": {
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
-    "react-router-dom": "^7.14.1",
+    "react-router-dom": "^7.18.0",
     "vis-network": "^10.0.3"
   },
   "devDependencies": {
@@ -13,7 +13,7 @@
     "@types/react-dom": "^18.3.1",
     "@vitejs/plugin-react": "^6.0.1",
     "marked": "^18.0.3",
-    "vite": "^8.0.12"
+    "vite": "^8.0.16"
   },
   "scripts": {
     "build-help": "node scripts/build-help.mjs",
